@@ -10,177 +10,208 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgres://neondb_owner:npg_4p5RYihEZesm@ep-raspy-silence-a10u9qpl-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"
-  //url      = "postgresql://postgres:nikita12345@localhost:5432/flowersShop?schema=public"
+  // url      = "postgres://neondb_owner:npg_4p5RYihEZesm@ep-raspy-silence-a10u9qpl-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"
+  url      = "postgresql://postgres:nikita12345@localhost:5432/CoffeCRM?schema=public"
 }
 
-model Address {
-  id           Int    @id @default(autoincrement()) @map("_id")
-  address      String
-  date_created String
-  date_updated String
-  User         User?  @relation(fields: [userId], references: [id])
-  userId       Int?
+// ---------- Основные типы ----------
+enum Role {
+  ADMIN
+  MANAGER
+  BARISTA
+  ACCOUNTANT
+  CUSTOMER
 }
 
-model Promocodes {
-  id           Int    @id @default(autoincrement()) @map("_id")
-  address      String
-  date_expired String
-  date_created String
-  date_updated String
+enum OrderStatus {
+  NEW
+  IN_PROGRESS
+  READY
+  COMPLETED
+  CANCELED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  WRITE_OFF
 }
 
 model User {
-  id             Int        @id @default(autoincrement()) @map("_id")
-  permission     Int        @default(0)
-  email          String     @unique
-  name           String?    @default("")
-  surname        String?    @default("")
-  phone          String     @unique
-  cart           Cart[]
-  history_orders Order[]
-  password       String
-  comments       comments[]
-  address        Address[]
-  face           String?
-  date_created   String
-  date_updated   String
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  fullName  String
+  role      Role     @default(CUSTOMER)
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // связи
+  employee Employee?
+  customer Customer?
 }
 
-model Cart {
-  id            Int                         @id @default(autoincrement()) @map("_id")
-  date          String
-  status        String
-  date_delivery String
-  count_product Int
-  product       CartandAndOrdersOnProduct[]
-  date_updated  String
-  User          User?                       @relation(fields: [userId], references: [id])
-  userId        Int?
+model Employee {
+  id       String   @id @default(uuid())
+  userId   String   @unique
+  position String
+  salary   Float?
+  hiredAt  DateTime @default(now())
+  kpis     Kpi[]
+
+  user     User    @relation(fields: [userId], references: [id])
+  branch   Branch? @relation(fields: [branchId], references: [id])
+  branchId String?
 }
 
-model CartandAndOrdersOnProduct {
-  id Int @id @default(autoincrement()) @map("_id")
+model Kpi {
+  id         String   @id @default(uuid())
+  employeeId String
+  metric     String
+  value      Float
+  date       DateTime @default(now())
 
-  date_created String
-  date_updated String
-  Cart         Cart?    @relation(fields: [cartId], references: [id])
-  cartId       Int?
-  Order        Order?   @relation(fields: [orderId], references: [id])
-  orderId      Int?
-  Product      Product? @relation(fields: [productId], references: [id])
-  productId    Int?
+  employee Employee @relation(fields: [employeeId], references: [id])
 }
 
-model Shops {
-  id           Int        @id @default(autoincrement()) @map("_id")
-  locate       String
-  name         String
-  abount       String
-  stats        Int
-  comments     comments[]
-  date_created String
-  date_updated String
-}
+model Branch {
+  id        String   @id @default(uuid())
+  name      String
+  address   String
+  city      String
+  createdAt DateTime @default(now())
 
-model Order {
-  id            Int                         @id @default(autoincrement()) @map("_id")
-  date          String
-  status        String
-  date_delivery String
-  address       String
-  total_service String
-  count_product Int
-  product       CartandAndOrdersOnProduct[]
-  date_created  String
-  date_updated  String
-  User          User?                       @relation(fields: [userId], references: [id])
-  userId        Int?
-}
-
-model Flowers {
-  id            Int              @id @default(autoincrement()) @map("_id")
-  name          String
-  date_created  String
-  date_updated  String
-  flowerConnect FlowersProduct[]
-}
-
-model FlowersProduct {
-  id           Int      @id @default(autoincrement()) @map("_id")
-  name         String
-  date_created String
-  date_updated String
-  Flowers      Flowers? @relation(fields: [flowersId], references: [id])
-  flowersId    Int?
-  Product      Product? @relation(fields: [productId], references: [id])
-  productId    Int?
-}
-
-model ProductSize {
-  id           Int    @id @default(autoincrement()) @map("_id")
-  name         String
-  size         Int
-  date_created String
-  date_updated String
-
-  Product SizesProduct[]
-}
-
-model SizesProduct {
-  id Int @id @default(autoincrement()) @map("_id")
-
-  date_created  String
-  date_updated  String
-  ProductSize   ProductSize? @relation(fields: [productSizeId], references: [id])
-  productSizeId Int?
-  Product       Product?     @relation(fields: [productId], references: [id])
-  productId     Int?
-}
-
-model Category {
-  id           Int       @id @default(autoincrement()) @map("_id")
-  name         String
-  icon         String
-  Product      Product[]
-  date_created String
-  date_updated String
+  employees Employee[]
+  stocks    Stock[]
+  orders    Order[]
+  bookings  Booking[]
 }
 
 model Product {
-  id           Int                         @id @default(autoincrement()) @map("_id")
-  image        String
-  name         String
-  color        String
-  sizes        SizesProduct[]
-  volume       String
-  amount       Int
-  flowers      FlowersProduct[]
-  count        Int
-  quantity     Int
-  total_count  Int
-  date_created String
-  comments     comments[]
-  date_updated String
-  actions      CartandAndOrdersOnProduct[]
+  id         String   @id @default(uuid())
+  name       String
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  price      Float
+  isActive   Boolean  @default(true)
 
-  Category   Category? @relation(fields: [categoryId], references: [id])
-  categoryId Int?
+  stocks     Stock[]
+  orderItems OrderItem[]
 }
 
-model comments {
-  id           Int      @id @default(autoincrement()) @map("_id")
-  name         String
-  description  String
-  image        String
-  about        String
-  date_created String
-  date_updated String
-  Shops        Shops?   @relation(fields: [shopsId], references: [id])
-  shopsId      Int?
-  User         User?    @relation(fields: [userId], references: [id])
-  userId       Int?
-  Product      Product? @relation(fields: [productId], references: [id])
-  productId    Int?
+model Category {
+  id       String    @id @default(uuid())
+  name     String
+  products Product[]
+}
+
+model Stock {
+  id        String @id @default(uuid())
+  branchId  String
+  productId String
+  quantity  Int    @default(0)
+
+  branch       Branch             @relation(fields: [branchId], references: [id])
+  product      Product            @relation(fields: [productId], references: [id])
+  transactions StockTransaction[]
+}
+
+model StockTransaction {
+  id       String          @id @default(uuid())
+  stockId  String
+  type     TransactionType
+  quantity Int
+  date     DateTime        @default(now())
+
+  stock Stock @relation(fields: [stockId], references: [id])
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  branchId   String
+  customerId String?
+  status     OrderStatus @default(NEW)
+  total      Float
+  createdAt  DateTime    @default(now())
+
+  branch   Branch      @relation(fields: [branchId], references: [id])
+  customer Customer?   @relation(fields: [customerId], references: [id])
+  items    OrderItem[]
+}
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Customer {
+  id       String    @id @default(uuid())
+  userId   String    @unique
+  bonus    Int       @default(0)
+  orders   Order[]
+  bookings Booking[]
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Booking {
+  id         String        @id @default(uuid())
+  branchId   String
+  customerId String
+  date       DateTime
+  timeFrom   DateTime
+  timeTo     DateTime
+  type       String
+  status     BookingStatus @default(PENDING)
+
+  branch   Branch   @relation(fields: [branchId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+}
+
+model Report {
+  id        String   @id @default(uuid())
+  type      String
+  period    String
+  fileUrl   String
+  createdAt DateTime @default(now())
+}
+
+model Company {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  PaymentSettings PaymentSettings[]
+
+  Integration Integration[]
+}
+
+model PaymentSettings {
+  id        String  @id @default(uuid())
+  provider  String
+  apiKey    String
+  companyId String  @unique
+  company   Company @relation(fields: [companyId], references: [id])
+}
+
+model Integration {
+  id        String  @id @default(uuid())
+  name      String
+  apiKey    String?
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
 }
