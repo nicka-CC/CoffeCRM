@@ -33,7 +33,7 @@ export class UserController {
   }
 
   @Get('all')
-  @ApiOperation({ summary: 'Получить всех пользователей с поиском' })
+  // @Controller('user')
   getAllUsers(@Query() searchDto: SearchUsersDto) {
     return this.userService.getAllUsers(searchDto);
   }

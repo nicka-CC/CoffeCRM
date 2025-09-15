@@ -1,56 +1,33 @@
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
-import {
-  Body,
-  Controller, Delete, Get,
-  Param, Patch,
-  Post, Query,
-  UseGuards,
-} from "@nestjs/common";
-import { JwtAuthGuard } from "../../jwt-auth.guard";
-import { GetUserId } from "../../user/auth/get-user-id.decorator";
-import { CreateOrderDto, UpdateOrderDto, GetOrdersDto } from "../../dto/cart.dto";
-import { OrdersService } from "./orders.service";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { OrdersService } from './orders.service';
+import { CreateOrderDto, UpdateOrderDto } from '../../dto/order.dto';
 
-@ApiTags('Orders')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Создать новый заказ' })
-  createOrder(@GetUserId() userId: number, @Body() dto: CreateOrderDto) {
-    return this.ordersService.createOrder(userId, dto);
+  create(@Body() dto: CreateOrderDto) {
+    return this.ordersService.create(dto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Получить заказы с фильтрацией' })
-  getOrders(@Query() filters: GetOrdersDto) {
-    return this.ordersService.getOrders(filters);
-  }
-
-  @Get('my')
-  @ApiOperation({ summary: 'Получить заказы текущего пользователя' })
-  getMyOrders(@GetUserId() userId: number, @Query() filters: Partial<GetOrdersDto>) {
-    return this.ordersService.getOrders({ ...filters, userId: userId.toString() });
+  findAll(@Query() query: any) {
+    return this.ordersService.findAll(query);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Получить заказ по ID' })
-  getOrderById(@Param('id') id: string) {
-    return this.ordersService.getOrderById(parseInt(id));
+  findOne(@Param('id') id: string) {
+    return this.ordersService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Обновить заказ' })
-  updateOrder(@Param('id') id: string, @Body() dto: UpdateOrderDto) {
-    return this.ordersService.updateOrder(parseInt(id), dto);
+  update(@Param('id') id: string, @Body() dto: UpdateOrderDto) {
+    return this.ordersService.update(id, dto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Удалить заказ' })
-  deleteOrder(@Param('id') id: string) {
-    return this.ordersService.deleteOrder(parseInt(id));
+  remove(@Param('id') id: string) {
+    return this.ordersService.remove(id);
   }
 }

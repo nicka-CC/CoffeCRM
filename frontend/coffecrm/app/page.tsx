@@ -1,103 +1,166 @@
-import Image from "next/image";
+import Layout from '../components/Layout/Layout';
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  Avatar,
+  Chip,
+} from '@mui/material';
+import {
+  People,
+  AdminPanelSettings,
+  ShoppingCart,
+  Assessment,
+  TrendingUp,
+  Security,
+} from '@mui/icons-material';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const stats = [
+    {
+      title: 'Total Users',
+      value: '1,234',
+      change: '+12%',
+      icon: <People />,
+      color: '#6366f1',
+    },
+    {
+      title: 'Active Roles',
+      value: '8',
+      change: '+2',
+      icon: <AdminPanelSettings />,
+      color: '#10b981',
+    },
+    {
+      title: 'Total Orders',
+      value: '5,678',
+      change: '+8%',
+      icon: <ShoppingCart />,
+      color: '#f59e0b',
+    },
+    {
+      title: 'Revenue',
+      value: '$45,678',
+      change: '+15%',
+      icon: <TrendingUp />,
+      color: '#ef4444',
+    },
+  ];
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  const quickActions = [
+    {
+      title: 'Manage Users',
+      description: 'View and edit user accounts',
+      icon: <People />,
+      path: '/users',
+      color: '#6366f1',
+    },
+    {
+      title: 'Role Management',
+      description: 'Configure roles and permissions',
+      icon: <AdminPanelSettings />,
+      path: '/roles',
+      color: '#10b981',
+    },
+    {
+      title: 'Create Role',
+      description: 'Add new user roles',
+      icon: <Security />,
+      path: '/roles/create',
+      color: '#f59e0b',
+    },
+    {
+      title: 'Analytics',
+      description: 'View system analytics',
+      icon: <Assessment />,
+      path: '/analytics',
+      color: '#ef4444',
+    },
+  ];
+
+  return (
+    <Layout 
+      title="Dashboard" 
+      subtitle="Welcome to CoffeeCRM. Manage your business operations efficiently."
+    >
+      <Box>
+        {/* Stats Cards */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          {stats.map((stat, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <Card sx={{ height: '100%' }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Avatar sx={{ backgroundColor: stat.color, mr: 2 }}>
+                      {stat.icon}
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                        {stat.value}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        {stat.title}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Chip
+                    label={stat.change}
+                    size="small"
+                    sx={{
+                      backgroundColor: stat.change.startsWith('+') ? '#dcfce7' : '#fef2f2',
+                      color: stat.change.startsWith('+') ? '#166534' : '#dc2626',
+                      fontWeight: 'medium'
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Quick Actions */}
+        <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>
+          Quick Actions
+        </Typography>
+        
+        <Grid container spacing={3}>
+          {quickActions.map((action, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <Card sx={{ height: '100%', cursor: 'pointer', '&:hover': { boxShadow: 3 } }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Avatar sx={{ backgroundColor: action.color, mr: 2 }}>
+                      {action.icon}
+                    </Avatar>
+                    <Typography variant="h6" sx={{ fontWeight: 'medium' }}>
+                      {action.title}
+                    </Typography>
+                  </Box>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+                    {action.description}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    size="small"
+                    sx={{ 
+                      color: action.color,
+                      textTransform: 'none',
+                      fontWeight: 'medium'
+                    }}
+                  >
+                    Go to {action.title}
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </Layout>
   );
 }

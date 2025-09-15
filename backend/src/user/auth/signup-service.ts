@@ -25,26 +25,17 @@ export class AuthService {
     if (userExists) {
       throw new BadRequestException('Этот email уже зарегистрирован');
     }
-    const userExistsPhone = await this.prisma.user.findUnique({
-      where: { phone: dto.phone},
-    });
 
-    if (userExistsPhone) {
-      throw new BadRequestException('Этот номер телефона уже зарегистрирован');
-    }
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
         password: hashedPassword,
-        name: dto.name,
-        surname: dto.surname,
+        fullName: dto.name,
         phone: dto.phone,
-        permission: dto.permission,
-        face: null,
-        date_created: new Date().toISOString(),
-        date_updated: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     });
 
@@ -63,9 +54,9 @@ export class AuthService {
       throw new UnauthorizedException('password is incorrect')
     }
 
-    const access_token = this.jwtService.sign({id:user.id, email:user.email, phone:user.phone, permissions:user.permission},
+    const access_token = this.jwtService.sign({id:user.id, email:user.email, phone:user.phone},
       {expiresIn: '15m'});
-    const refreash_token = this.jwtService.sign({id:user.id, email:user.email, phone:user.phone, permissions:user.permission},
+    const refreash_token = this.jwtService.sign({id:user.id, email:user.email, phone:user.phone},
       {expiresIn: '15d'});
 
     return { message: 'Авторизация успешна', user: user, access_token: access_token, refreash_token: refreash_token };
@@ -74,7 +65,7 @@ export class AuthService {
     const skip = (page - 1) * limit;
     const total = await this.prisma.user.count({});
     const data = await this.prisma.user.findMany({
-      where:{permission:2},
+      where:{},
       skip,
       take:limit,
     });
