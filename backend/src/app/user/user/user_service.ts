@@ -6,63 +6,23 @@ import { UpdateUserDto, SearchUsersDto } from "../../../dto/user.dro";
 export class UserService {
   constructor(private prisma:PrismaService) {}
   
-  async getUserInfo(userId: number) {
+  async getUserInfo(userId: string) {
+    // Подключаем реальные связи из Prisma-схемы: employee и customer
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
-        cart: {
+        employee: {
           include: {
-            product: {
-              include: {
-                Product: {
-                  include: {
-                    Category: true,
-                    sizes: {
-                      include: {
-                        ProductSize: true
-                      }
-                    },
-                    flowers: {
-                      include: {
-                        Flowers: true
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            branch: true,
+            kpis: true
           }
         },
-        history_orders: {
+        customer: {
           include: {
-            product: {
-              include: {
-                Product: {
-                  include: {
-                    Category: true,
-                    sizes: {
-                      include: {
-                        ProductSize: true
-                      }
-                    },
-                    flowers: {
-                      include: {
-                        Flowers: true
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            orders: true,
+            bookings: true
           }
-        },
-        comments: {
-          include: {
-            Product: true,
-            Shops: true
-          }
-        },
-        address: true
+        }
       },
     });
 
@@ -73,67 +33,16 @@ export class UserService {
     return safeUser;
   }
 
-  async updateUser(userId: number, dto: UpdateUserDto) {
+  async updateUser(userId: string, dto: UpdateUserDto) {
+    // Не вручную обновляем поле updatedAt — Prisma сделает это автоматически
     const user = await this.prisma.user.update({
       where: { id: userId },
       data: {
         ...dto,
-        date_updated: new Date().toISOString(),
       },
       include: {
-        cart: {
-          include: {
-            product: {
-              include: {
-                Product: {
-                  include: {
-                    Category: true,
-                    sizes: {
-                      include: {
-                        ProductSize: true
-                      }
-                    },
-                    flowers: {
-                      include: {
-                        Flowers: true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        history_orders: {
-          include: {
-            product: {
-              include: {
-                Product: {
-                  include: {
-                    Category: true,
-                    sizes: {
-                      include: {
-                        ProductSize: true
-                      }
-                    },
-                    flowers: {
-                      include: {
-                        Flowers: true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        comments: {
-          include: {
-            Product: true,
-            Shops: true
-          }
-        },
-        address: true
+        employee: true,
+        customer: true,
       },
     });
 
@@ -141,7 +50,7 @@ export class UserService {
     return safeUser;
   }
 
-  async deleteUser(userId: number) {
+  async deleteUser(userId: string) {
     await this.prisma.user.delete({
       where: { id: userId },
     });
@@ -154,10 +63,10 @@ export class UserService {
     const skip = parseInt(page) * parseInt(limit);
     const take = parseInt(limit);
 
+    // В Prisma модель User имеет поле `fullName`, используем его при поиске
     const where = name ? {
       OR: [
-        { name: { contains: name, mode: 'insensitive' as const } },
-        { surname: { contains: name, mode: 'insensitive' as const } },
+        { fullName: { contains: name, mode: 'insensitive' as const } },
         { email: { contains: name, mode: 'insensitive' as const } }
       ]
     } : {};
@@ -168,12 +77,11 @@ export class UserService {
         skip,
         take,
         include: {
-          cart: true,
-          history_orders: true,
-          comments: true,
-          address: true
+          employee: true,
+          customer: true,
         },
-        orderBy: { date_created: 'desc' }
+        // Prisma schema uses `createdAt` for creation timestamp
+        orderBy: { createdAt: 'desc' }
       }),
       this.prisma.user.count({ where })
     ]);

@@ -28,7 +28,7 @@ export class UserController {
 
   @Get('me')
   @ApiOperation({ summary: 'Получить информацию о текущем пользователе' })
-  getMe(@GetUserId() userId: number) {
+  getMe(@GetUserId() userId: string) {
     return this.userService.getUserInfo(userId);
   }
 
@@ -42,7 +42,7 @@ export class UserController {
   @ApiOperation({ summary: 'Обновить данные текущего пользователя' })
   @ApiConsumes("multipart/form-data")
   @UseInterceptors(
-    FileInterceptor("face", {
+    FileInterceptor("icon", {
       storage: diskStorage({
         destination: "./uploads", // Папка для сохранения изображений
         filename: (req, file, callback) => {
@@ -54,7 +54,7 @@ export class UserController {
     }),
   )
   async updateMe(
-    @GetUserId() userId: number,
+    @GetUserId() userId: string,
     @UploadedFile() file: Express.Multer.File, // Тип для файла
     @Body() dto: UpdateUserDto // DTO для данных
   ) {
@@ -62,7 +62,7 @@ export class UserController {
     
     if (file) {
       const imagePath = `/uploads/${file.filename}`;
-      updatedDto.face = imagePath;
+      updatedDto.icon = imagePath;
     }
     
     return this.userService.updateUser(userId, updatedDto);
@@ -70,21 +70,21 @@ export class UserController {
 
   @Delete('me')
   @ApiOperation({ summary: 'Удалить текущего пользователя' })
-  deleteMe(@GetUserId() userId: number) {
+  deleteMe(@GetUserId() userId: string) {
     return this.userService.deleteUser(userId);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Получить пользователя по ID' })
   getUserById(@Param('id') id: string) {
-    return this.userService.getUserInfo(parseInt(id));
+    return this.userService.getUserInfo(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Обновить пользователя по ID' })
   @ApiConsumes("multipart/form-data")
   @UseInterceptors(
-    FileInterceptor("face", {
+    FileInterceptor("icon", {
       storage: diskStorage({
         destination: "./uploads",
         filename: (req, file, callback) => {
@@ -104,15 +104,15 @@ export class UserController {
     
     if (file) {
       const imagePath = `/uploads/${file.filename}`;
-      updatedDto.face = imagePath;
+      updatedDto.icon = imagePath;
     }
     
-    return this.userService.updateUser(parseInt(id), updatedDto);
+    return this.userService.updateUser(id, updatedDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Удалить пользователя по ID' })
   deleteUser(@Param('id') id: string) {
-    return this.userService.deleteUser(parseInt(id));
+    return this.userService.deleteUser(id);
   }
 }

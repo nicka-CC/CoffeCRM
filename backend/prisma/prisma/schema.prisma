@@ -17,10 +17,9 @@ datasource db {
 // ---------- Основные типы ----------
 enum Role {
   ADMIN
-  MANAGER
-  BARISTA
-  ACCOUNTANT
-  CUSTOMER
+  READ
+  EDITE
+  WRITE
 }
 
 enum OrderStatus {
@@ -46,9 +45,10 @@ enum TransactionType {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
+  icon      String?
   password  String
   fullName  String
-  role      Role     @default(CUSTOMER)
+  role      Role     @default(READ)
   phone     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -66,9 +66,11 @@ model Employee {
   hiredAt  DateTime @default(now())
   kpis     Kpi[]
 
-  user     User    @relation(fields: [userId], references: [id])
-  branch   Branch? @relation(fields: [branchId], references: [id])
-  branchId String?
+  user      User     @relation(fields: [userId], references: [id])
+  branch    Branch?  @relation(fields: [branchId], references: [id])
+  branchId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Kpi {
@@ -78,12 +80,15 @@ model Kpi {
   value      Float
   date       DateTime @default(now())
 
-  employee Employee @relation(fields: [employeeId], references: [id])
+  employee  Employee @relation(fields: [employeeId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Branch {
   id        String   @id @default(uuid())
   name      String
+  icon      String?
   address   String
   city      String
   createdAt DateTime @default(now())
@@ -92,11 +97,13 @@ model Branch {
   stocks    Stock[]
   orders    Order[]
   bookings  Booking[]
+  updatedAt DateTime   @updatedAt
 }
 
 model Product {
   id         String   @id @default(uuid())
   name       String
+  icon       String?
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
   price      Float
@@ -104,12 +111,17 @@ model Product {
 
   stocks     Stock[]
   orderItems OrderItem[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 }
 
 model Category {
-  id       String    @id @default(uuid())
-  name     String
-  products Product[]
+  id        String    @id @default(uuid())
+  name      String
+  icon      String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Stock {
@@ -121,6 +133,8 @@ model Stock {
   branch       Branch             @relation(fields: [branchId], references: [id])
   product      Product            @relation(fields: [productId], references: [id])
   transactions StockTransaction[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 }
 
 model StockTransaction {
@@ -130,7 +144,9 @@ model StockTransaction {
   quantity Int
   date     DateTime        @default(now())
 
-  stock Stock @relation(fields: [stockId], references: [id])
+  stock     Stock    @relation(fields: [stockId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Order {
@@ -141,9 +157,10 @@ model Order {
   total      Float
   createdAt  DateTime    @default(now())
 
-  branch   Branch      @relation(fields: [branchId], references: [id])
-  customer Customer?   @relation(fields: [customerId], references: [id])
-  items    OrderItem[]
+  branch    Branch      @relation(fields: [branchId], references: [id])
+  customer  Customer?   @relation(fields: [customerId], references: [id])
+  items     OrderItem[]
+  updatedAt DateTime    @updatedAt
 }
 
 model OrderItem {
@@ -153,8 +170,10 @@ model OrderItem {
   quantity  Int
   price     Float
 
-  order   Order   @relation(fields: [orderId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Customer {
@@ -164,7 +183,9 @@ model Customer {
   orders   Order[]
   bookings Booking[]
 
-  user User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Booking {
@@ -177,8 +198,10 @@ model Booking {
   type       String
   status     BookingStatus @default(PENDING)
 
-  branch   Branch   @relation(fields: [branchId], references: [id])
-  customer Customer @relation(fields: [customerId], references: [id])
+  branch    Branch   @relation(fields: [branchId], references: [id])
+  customer  Customer @relation(fields: [customerId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Report {
@@ -187,10 +210,12 @@ model Report {
   period    String
   fileUrl   String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Company {
   id          String   @id @default(uuid())
+  icon        String?
   name        String
   description String?
   createdAt   DateTime @default(now())
@@ -198,20 +223,27 @@ model Company {
   PaymentSettings PaymentSettings[]
 
   Integration Integration[]
+  updatedAt   DateTime      @updatedAt
 }
 
 model PaymentSettings {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
+  icon      String?
   provider  String
   apiKey    String
-  companyId String  @unique
-  company   Company @relation(fields: [companyId], references: [id])
+  companyId String   @unique
+  company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Integration {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
+  icon      String?
   name      String
   apiKey    String?
   companyId String
-  company   Company @relation(fields: [companyId], references: [id])
+  company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -6,20 +6,16 @@ export class UpdateUserDto {
   @ApiProperty({
     type: 'string',
     format: 'binary',
-    description: 'image balloon'
+    description: 'image user'
   })
   @IsOptional()
-  face?: string;
+  icon?: string;
   
-  @IsOptional()
-  @IsString()
-  @ApiProperty({example:'golder', description:'gas golder'})
-  name?: string;
 
   @IsOptional()
   @IsString()
   @ApiProperty({example:'golder', description:'gas golder'})
-  surname?: string;
+  fullName?: string;
 
   @IsOptional()
   @ApiProperty({example:'golder', description:'gas golder'})
@@ -31,10 +27,6 @@ export class UpdateUserDto {
   @ApiProperty({example:'user@example.com', description:'user email'})
   email?: string;
 
-  @IsOptional()
-  @IsString()
-  @ApiProperty({example:'password123', description:'user password'})
-  password?: string;
 }
 
 export class SearchUsersDto {

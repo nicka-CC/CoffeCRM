@@ -120,6 +120,6 @@ export class CategoryController {
       @Req() req: Request,
      @Param("id") id: string,) {
     const user = (req as any).user;
-    return this.categoryService.delete(user, Number(id));
+    return this.categoryService.delete(user, id);
   }
   }

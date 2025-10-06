@@ -18,9 +18,9 @@ export class CategoryService {
     const newGasBallon = await this.prisma.category.create({
       data: {
         name:dto.name,
-        icon:dto.icon,
-        date_created: new Date().toISOString(),
-        date_updated: new Date().toISOString(),
+        // icon:dto.icon,
+        // date_created: new Date().toISOString(),
+        // date_updated: new Date().toISOString(),
       }
     });
     return newGasBallon;
@@ -32,11 +32,11 @@ export class CategoryService {
       throw new UnauthorizedException('You haven`t privileges users');
     }
 
-    const updatedGasBallon = await this.prisma.category.update({where:{id:Number(gas_ballon_id)},
+    const updatedGasBallon = await this.prisma.category.update({where:{id:gas_ballon_id},
     data: {
       name:dto.name,
-      icon:dto.icon,
-      date_updated: new Date().toISOString(),
+      // icon:dto.icon,
+      // date_updated: new Date().toISOString(),
     }})
     return updatedGasBallon;
   }
@@ -62,12 +62,12 @@ export class CategoryService {
 
 
 
-  async delete(user,id:number){
+  async delete(user,id:string){
     if (user.permission !< 2){
       throw new UnauthorizedException('You haven`t privileges users');
     }
 
-    const deleteRecord = await this.prisma.product.delete({where:{id:Number(id)}});
+    const deleteRecord = await this.prisma.product.delete({where:{id:id}});
     return deleteRecord;
   }
 }

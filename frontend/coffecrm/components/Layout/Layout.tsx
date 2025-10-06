@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Box,
   AppBar,
@@ -19,7 +19,7 @@ import {
   GridView,
 } from '@mui/icons-material';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import {usePathname, useRouter} from 'next/navigation';
 import Sidebar from './Sidebar';
 
 interface LayoutProps {
@@ -40,14 +40,28 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
 
+  useEffect(() => {
+    const token = sessionStorage.getItem('access_token'); // или localStorage
+    if (!token) {
+      router.replace('/login'); // сразу редирект
+    } else {
+      setAuthorized(true); // рендерим только если есть токен
+    }
+  }, [router]);
+
+  if (!authorized) {
+    return (<div style={{ display: 'flex', backgroundColor:'white', width:'100%',height:'100%' }}></div>); // пока редирект, ничего не рендерим (нет мигания)
+  }
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', backgroundColor:'white' }}>
       {/* Sidebar */}
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       
       {/* Main Content */}
-      <Box component="main" sx={{ flexGrow: 1, minHeight: '100vh' }}>
+      <Box component="main" sx={{ flexGrow: 1, minHeight: '100%' }}>
         {/* Top App Bar */}
         <AppBar position="static" sx={{ backgroundColor: 'white', color: 'black', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}>
           <Toolbar>
@@ -56,17 +70,17 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
               color="inherit"
               aria-label="menu"
               onClick={() => setSidebarOpen(true)}
-              sx={{ mr: 2 }}
+              sx={{  }}
             >
               <MenuIcon />
             </IconButton>
-            
+
             {/* Logo */}
             <Box sx={{ display: 'flex', alignItems: 'center', mr: 4 }}>
-              <Box sx={{ 
-                width: 32, 
-                height: 32, 
-                backgroundColor: '#6366f1', 
+              <Box sx={{
+                width: 32,
+                height: 32,
+                backgroundColor: '#6366f1',
                 borderRadius: '6px',
                 display: 'flex',
                 alignItems: 'center',
@@ -79,13 +93,13 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
                 CoffeeCRM
               </Typography>
             </Box>
-            
+
             {/* Navigation Menu */}
             <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 3 }}>
               <Link href="/" style={{ textDecoration: 'none' }}>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
+                <Typography
+                  variant="body2"
+                  sx={{
                     color: pathname === '/' ? '#6366f1' : 'text.secondary',
                     borderBottom: pathname === '/' ? '2px solid #6366f1' : 'none',
                     pb: 0.5,
@@ -96,9 +110,9 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
                 </Typography>
               </Link>
               <Link href="/users" style={{ textDecoration: 'none' }}>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
+                <Typography
+                  variant="body2"
+                  sx={{
                     color: pathname === '/users' ? '#6366f1' : 'text.secondary',
                     borderBottom: pathname === '/users' ? '2px solid #6366f1' : 'none',
                     pb: 0.5,
@@ -109,9 +123,9 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
                 </Typography>
               </Link>
               <Link href="/roles" style={{ textDecoration: 'none' }}>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
+                <Typography
+                  variant="body2"
+                  sx={{
                     color: pathname === '/roles' ? '#6366f1' : 'text.secondary',
                     borderBottom: pathname === '/roles' ? '2px solid #6366f1' : 'none',
                     pb: 0.5,
@@ -122,9 +136,9 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
                 </Typography>
               </Link>
               <Link href="/roles/create" style={{ textDecoration: 'none' }}>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
+                <Typography
+                  variant="body2"
+                  sx={{
                     color: pathname === '/roles/create' ? '#6366f1' : 'text.secondary',
                     borderBottom: pathname === '/roles/create' ? '2px solid #6366f1' : 'none',
                     pb: 0.5,
@@ -135,13 +149,13 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
                 </Typography>
               </Link>
             </Box>
-            
+
             {/* Right Side Actions */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Button
                 variant="outlined"
                 size="small"
-                sx={{ 
+                sx={{
                   textTransform: 'none',
                   borderColor: '#e0e0e0',
                   color: 'text.secondary',
@@ -153,11 +167,11 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
               >
                 Feedback
               </Button>
-              
+
               <IconButton size="small">
                 <GridView />
               </IconButton>
-              
+
               <IconButton
                 size="large"
                 aria-label="account of current user"
@@ -170,7 +184,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
                   <AccountCircle />
                 </Avatar>
               </IconButton>
-              
+
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorEl}
@@ -195,7 +209,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
         </AppBar>
         
         {/* Page Content */}
-        <Box sx={{ p: 3, backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 64px)' }}>
+        <Box sx={{  backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 64px)' }}>
           {title && (
             <Box sx={{ mb: 3 }}>
               <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
