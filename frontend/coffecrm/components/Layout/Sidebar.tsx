@@ -27,6 +27,16 @@ import {
   Assessment,
   Settings,
   Payment,
+  Login,
+  Security,
+  FlashOn,
+  PersonAdd,
+  TrendingUp,
+  Store,
+  Info,
+  Coffee,
+  Inventory, Warehouse,
+  Delete, LocalShipping, Person, Star, VpnKey, Download, CalendarToday, Description,
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -82,50 +92,106 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   // Sidebar sections and items for a modern, clean look
   const sidebarSections = [
     {
-      header: 'Menu',
+      header: 'Авторизация',
       items: [
-        { title: 'Overview', icon: <Dashboard />, path: '/dashboard' },
-        { title: 'Analytics', icon: <Assessment />, path: '/analytics' },
-        { 
-          title: 'Campaigns',
-          icon: <Assessment />,
-          path: '/campaigns',
-        },
-        { title: 'CRM', icon: <People />, path: '/crm' },
-        { title: 'Schedule', icon: <Assessment />, path: '/schedule' },
-        { title: 'Reports', icon: <Assessment />, path: '/reports' },
-      ]
+        { title: 'Логин', icon: <Login />, path: '/auth/login' },
+        { title: 'Регистрация', icon: <PersonAdd />, path: '/auth/register' },
+        { title: 'Роли', icon: <Security />, path: '/auth/roles' },
+      ],
     },
     {
-      header: 'Shop',
+      header: 'Dashboard',
       items: [
+        { title: 'Статистика дня', icon: <Dashboard />, path: '/dashboard/daily-stats' },
+        { title: 'Графики продаж', icon: <TrendingUp />, path: '/dashboard/sales-charts' },
+        { title: 'Быстрые действия', icon: <FlashOn />, path: '/dashboard/quick-actions' },
+      ],
+    },
+    {
+      header: 'Филиалы',
+      items: [
+        { title: 'Список филиалов', icon: <Store />, path: '/branches/list' },
+        { title: 'Карта', icon: <Store />, path: '/branches/map' },
         {
-          title: 'Products',
-          icon: <ShoppingCart />,
-          path: '/products',
+          title: 'Детали филиала',
+          icon: <Info />,
+          path: '/branches/details',
           expandable: true,
-          key: 'shop-products',
+          key: 'branches-details',
           children: [
-            { title: 'Sales Overview', path: '/sales' },
-            { title: 'Statics', path: '/statistics' },
-            { title: 'Top Products', path: '/top-products' },
-            { title: 'Add Product', path: '/add-product' },
-          ]
+            { title: 'Сотрудники', path: '/branches/details/staff' },
+            { title: 'Продажи', path: '/branches/details/sales' },
+            { title: 'Запасы', path: '/branches/details/inventory' },
+          ],
         },
-      ]
+      ],
     },
     {
-      header: 'Settings',
+      header: 'Товары и меню',
       items: [
-        {
-          title: 'Account',
-          icon: <Settings />,
-          path: '/account',
-        },
-        { title: 'Author Profile', icon: <Settings />, path: '/profile' },
-        { title: 'Refund Requests', icon: <Settings />, path: '/refunds' },
-        { title: 'Tax Information', icon: <Settings />, path: '/tax' },
-      ]
+        { title: 'Список товаров', icon: <Coffee />, path: '/menu/products' },
+        { title: 'Категории', icon: <List />, path: '/menu/categories' },
+        { title: 'Остатки по филиалам', icon: <Inventory />, path: '/menu/branch-inventory' },
+      ],
+    },
+    {
+      header: 'Склад',
+      items: [
+        { title: 'Остатки', icon: <Warehouse />, path: '/warehouse/inventory' },
+        { title: 'Приход/Расход', icon: <LocalShipping />, path: '/warehouse/transactions' },
+        { title: 'Списание', icon: <Delete />, path: '/warehouse/write-off' },
+      ],
+    },
+    {
+      header: 'Заказы',
+      items: [
+        { title: 'Таблица заказов', icon: <ShoppingCart />, path: '/orders/list' },
+        { title: 'Статусы', icon: <List />, path: '/orders/statuses' },
+        { title: 'Детали заказа', icon: <Info />, path: '/orders/details' },
+      ],
+    },
+    {
+      header: 'Клиенты',
+      items: [
+        { title: 'Список', icon: <Person />, path: '/customers/list' },
+        { title: 'История заказов', icon: <List />, path: '/customers/order-history' },
+        { title: 'Бонусы', icon: <Star />, path: '/customers/bonuses' },
+      ],
+    },
+    {
+      header: 'Сотрудники',
+      items: [
+        { title: 'Список сотрудников', icon: <People />, path: '/staff/list' },
+        { title: 'Роли и доступы', icon: <VpnKey />, path: '/staff/roles' },
+        { title: 'KPI', icon: <Assessment />, path: '/staff/kpi' },
+      ],
+    },
+    {
+      header: 'Аналитика',
+      items: [
+        { title: 'Продажи по периодам', icon: <TrendingUp />, path: '/analytics/sales-periods' },
+        { title: 'ТОП товаров/клиентов', icon: <Star />, path: '/analytics/top' },
+        { title: 'По филиалам', icon: <Store />, path: '/analytics/branches' },
+        { title: 'Экспорт Excel/PDF', icon: <Download />, path: '/analytics/export' },
+      ],
+    },
+    {
+      header: 'Настройки',
+      items: [
+        { title: 'Компания', icon: <Settings />, path: '/settings/company' },
+        { title: 'Платежи', icon: <Payment />, path: '/settings/payments' },
+        { title: 'Интеграции', icon: <Settings />, path: '/settings/integrations' },
+      ],
+    },
+    {
+      header: 'Бронирования',
+      items: [
+        { title: 'Список бронирований', icon: <CalendarToday />, path: '/reservations/list' },
+        { title: 'Календарь', icon: <CalendarToday />, path: '/reservations/calendar' },
+        { title: 'Детали бронирования', icon: <Info />, path: '/reservations/details' },
+        { title: 'Управление', icon: <Settings />, path: '/reservations/management' },
+        { title: 'Отчёты', icon: <Description />, path: '/reservations/reports' },
+      ],
     },
   ];
 

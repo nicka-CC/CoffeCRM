@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import {useEffect, useState, useRef} from 'react';
 import {
     Container,
     TextField,
@@ -11,7 +11,7 @@ import {
     Box,
     IconButton,
 } from '@mui/material';
-import { useRouter } from 'next/navigation';
+import {useRouter} from 'next/navigation';
 import Layout from "@/components/Layout/Layout";
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 
@@ -24,10 +24,28 @@ interface User {
     icon?: string; // URL или base64 изображения
 }
 
-export default function UserEditPage({ params }: { params: { id: string } }) {
-    const { id } = params;
+export default function UserEditPage({params}: { params: { id: string } }) {
+    const {id} = params;
     const router = useRouter();
     const token = sessionStorage.getItem("access_token");
+    const parseJwt = (token: string | null) => {
+        if (!token) {
+            console.error("Токен отсутствует");
+            return null;
+        }
+
+        try {
+            const [headerEncoded, payloadEncoded] = token.split('.').slice(0, 2);
+            const header = JSON.parse(atob(headerEncoded));
+            const payload = JSON.parse(atob(payloadEncoded));
+            return { header, payload };
+        } catch (error) {
+            console.error("Ошибка при парсинге токена:", error);
+            return null;
+        }
+    };
+    const parsedToken = parseJwt(token);
+    const role = parsedToken?.payload?.role;
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -36,7 +54,7 @@ export default function UserEditPage({ params }: { params: { id: string } }) {
 
     const fetchUser = async () => {
         try {
-            const res = await fetch(`http://localhost:7000/user/${id}`,{
+            const res = await fetch(`http://localhost:7000/user/${id}`, {
                 method: "GET",
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -124,102 +142,117 @@ export default function UserEditPage({ params }: { params: { id: string } }) {
         fetchUser();
     }, [id]);
 
-    if (loading) return <CircularProgress />;
+    if (loading) return <CircularProgress/>;
     if (!user) return <p>User not found</p>;
 
     return (
         <Layout>
-            <form
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '1rem',
-                    maxWidth: 400,
-                    backgroundColor: 'gray',
-                    padding: '2rem',
-                    borderRadius: '1rem'
-                }}
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSave();
-                }}
-            >
-                {/* Аватар с возможностью загрузки */}
-                <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-                    <Avatar
-                        src={avatarPreview || undefined}
-                        sx={{ width: 100, height: 100 }}
-                    />
-                    <Box display="flex" gap={1}>
-                        <Button
-                            variant="outlined"
-                            component="label"
-                            startIcon={<PhotoCamera />}
-                            size="small"
-                        >
-                            Upload
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                hidden
-                                accept="image/*"
-                                onChange={handleAvatarChange}
-                            />
-                        </Button>
-                        {avatarPreview && (
+            <div style={{display: 'flex'}}>
+                <form
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '1rem',
+                        margin: '10px',
+                        width: 400,
+                        backgroundColor: '#f7f7f7',
+                        padding: '2rem',
+                        borderRadius: '10px'
+                    }}
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSave();
+                    }}
+                >
+                    {/* Аватар с возможностью загрузки */}
+                    <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <Avatar
+                            src={avatarPreview || undefined}
+                            sx={{width: 100, height: 100}}
+                        />
+                        <Box display="flex" gap={1}>
                             <Button
                                 variant="outlined"
-                                color="error"
+                                component="label"
+                                startIcon={<PhotoCamera/>}
                                 size="small"
-                                onClick={handleAvatarRemove}
+                                disabled={role==='READ'}
                             >
-                                Remove
+                                Upload
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    hidden
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                />
                             </Button>
-                        )}
+                            {avatarPreview && (
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    size="small"
+                                    onClick={handleAvatarRemove}
+                                    disabled={role==='READ'}
+                                >
+                                    Remove
+                                </Button>
+                            )}
+                        </Box>
                     </Box>
-                </Box>
 
-                <TextField
-                    label="Email"
-                    value={user.email}
-                    onChange={(e) => setUser({ ...user, email: e.target.value })}
-                    required
-                />
-                <TextField
-                    label="Full Name"
-                    value={user.fullName}
-                    onChange={(e) => setUser({ ...user, fullName: e.target.value })}
-                    required
-                />
-                <TextField
-                    label="Role"
-                    select
-                    value={user.role}
-                    onChange={(e) => setUser({ ...user, role: e.target.value })}
-                    required
-                >
-                    <MenuItem value="ADMIN">Администратор</MenuItem>
-                    <MenuItem value="EDIT">Редактор</MenuItem>
-                    <MenuItem value="READ">Читатель</MenuItem>
-                </TextField>
-                <TextField
-                    label="Phone"
-                    value={user.phone}
-                    onChange={(e) => setUser({ ...user, phone: e.target.value })}
-                    required
-                />
 
-                <Button type="submit" variant="contained" color="primary">
-                    Save
-                </Button>
-                <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={handleDelete}
-                >
-                    Delete
-                </Button>
-            </form>
+                    <TextField
+                        label="Email"
+                        value={user.email}
+                        onChange={(e) => setUser({...user, email: e.target.value})}
+                        required
+                        disabled={role==='READ'}
+                    />
+                    <TextField
+                        label="Full Name"
+                        disabled={role==='READ'}
+                        value={user.fullName}
+                        onChange={(e) => setUser({...user, fullName: e.target.value})}
+                        required
+                    />
+                    <TextField
+                        disabled={role==='READ'}
+                        label="Role"
+                        select
+                        value={user.role}
+                        onChange={(e) => setUser({...user, role: e.target.value})}
+                        required
+                    >
+                        <MenuItem value="ADMIN">Администратор</MenuItem>
+                        <MenuItem value="EDITE">Редактор</MenuItem>
+                        <MenuItem value="READ">Читатель</MenuItem>
+                    </TextField>
+                    <TextField
+                        disabled={role==='READ'}
+                        label="Phone"
+                        value={user.phone}
+                        onChange={(e) => setUser({...user, phone: e.target.value})}
+                        required
+                    />
+
+                    <Button type="submit" variant="contained" color="primary"
+                            disabled={role==='READ'}>
+                        Save
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        disabled={!(role==='ADMIN')}
+                        onClick={handleDelete}
+                    >
+                        Delete
+                    </Button>
+                </form>
+                <div>
+                    пользователь замешен в:
+                </div>
+            </div>
         </Layout>
     );
 }

@@ -54,8 +54,8 @@ export class AuthService {
       throw new UnauthorizedException('password is incorrect')
     }
 
-    const access_token = this.jwtService.sign({id:user.id, email:user.email, phone:user.phone},
-      {expiresIn: '15m'});
+    const access_token = this.jwtService.sign({id:user.id, email:user.email, phone:user.phone, role:user.role},
+      {expiresIn: '15h'});
     const refreash_token = this.jwtService.sign({id:user.id, email:user.email, phone:user.phone},
       {expiresIn: '15d'});
 
