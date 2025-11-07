@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { StockService } from './stock.service';
 import { CreateStockDto, UpdateStockDto } from '../../dto/stock.dto';
+import { CreateStockTransactionDto } from '../../dto/stock-transaction.dto';
 
 @Controller('stocks')
 export class StockController {
@@ -16,9 +17,25 @@ export class StockController {
     return this.stockService.findAll(query);
   }
 
+  @Get('overview')
+  getOverview() {
+    return this.stockService.getInventoryOverview();
+  }
+
+  @Get('alerts/low')
+  getLowStockAlerts(@Query('threshold') threshold?: string) {
+    const numericThreshold = threshold ? Number(threshold) : undefined;
+    return this.stockService.getLowStockAlerts(numericThreshold ?? 10);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.stockService.findOne(id);
+  }
+
+  @Post(':id/transactions')
+  registerTransaction(@Param('id') id: string, @Body() dto: CreateStockTransactionDto) {
+    return this.stockService.registerTransaction({ ...dto, stockId: id });
   }
 
   @Patch(':id')

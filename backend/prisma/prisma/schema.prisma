@@ -86,12 +86,29 @@ model Kpi {
 }
 
 model Branch {
-  id        String   @id @default(uuid())
-  name      String
-  icon      String?
-  address   String
-  city      String
-  createdAt DateTime @default(now())
+  id          String   @id @default(uuid())
+  name        String
+  icon        String?
+  address     String
+  city        String
+  region      String?
+  postalCode  String?
+  country     String   @default("Россия")
+  phone       String?
+  email       String?
+  website     String?
+  latitude    Float?
+  longitude   Float?
+  timezone    String   @default("Europe/Moscow")
+  openTime    String?
+  closeTime   String?
+  isActive    Boolean  @default(true)
+  managerName String?
+  managerPhone String?
+  area        Float?   // площадь в м²
+  capacity    Int?     // вместимость
+  description String?
+  createdAt   DateTime @default(now())
 
   employees Employee[]
   stocks    Stock[]
@@ -101,13 +118,36 @@ model Branch {
 }
 
 model Product {
-  id         String   @id @default(uuid())
-  name       String
-  icon       String?
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId String
-  price      Float
-  isActive   Boolean  @default(true)
+  id            String   @id @default(uuid())
+  name          String
+  nameEn        String?
+  icon          String?
+  category      Category @relation(fields: [categoryId], references: [id])
+  categoryId    String
+  price         Float
+  cost          Float?
+  oldPrice      Float?
+  sku           String?  @unique // артикул
+  barcode       String?  @unique // штрихкод
+  unit          String   @default("шт") // единица измерения
+  weight        Float?   // вес в граммах
+  volume        Float?   // объем в мл
+  calories      Int?     // калории
+  proteins      Float?   // белки
+  fats          Float?   // жиры
+  carbs         Float?   // углеводы
+  description   String?
+  composition   String?  // состав
+  allergens     String?  // аллергены
+  shelfLife     Int?     // срок годности в днях
+  storageTemp   String?  // температура хранения
+  imageUrl      String?
+  images        String[] // массив дополнительных изображений
+  isActive      Boolean  @default(true)
+  isPopular     Boolean  @default(false)
+  isNew         Boolean  @default(false)
+  sortOrder     Int      @default(0)
+  tags          String[] // теги
 
   stocks     Stock[]
   orderItems OrderItem[]
@@ -125,24 +165,46 @@ model Category {
 }
 
 model Stock {
-  id        String @id @default(uuid())
-  branchId  String
-  productId String
-  quantity  Int    @default(0)
+  id              String @id @default(uuid())
+  branchId        String
+  productId       String
+  quantity        Int    @default(0)
+  reserved        Int    @default(0) // зарезервировано
+  minQuantity     Int    @default(0) // минимальный остаток
+  maxQuantity     Int?   // максимальный остаток
+  reorderPoint    Int?   // точка заказа
+  location        String? // место хранения на складе
+  batchNumber     String? // номер партии
+  expiryDate      DateTime? // срок годности
+  purchasePrice   Float? // закупочная цена
+  supplier        String? // поставщик
+  lastRestockedAt DateTime? // последнее пополнение
+  notes           String? // заметки
 
   branch       Branch             @relation(fields: [branchId], references: [id])
   product      Product            @relation(fields: [productId], references: [id])
   transactions StockTransaction[]
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
+
+  @@unique([branchId, productId])
 }
 
 model StockTransaction {
-  id       String          @id @default(uuid())
-  stockId  String
-  type     TransactionType
-  quantity Int
-  date     DateTime        @default(now())
+  id          String          @id @default(uuid())
+  stockId     String
+  type        TransactionType
+  quantity    Int
+  date        DateTime        @default(now())
+  price       Float? // цена за единицу
+  totalPrice  Float? // общая стоимость
+  reason      String? // причина операции
+  document    String? // номер документа (накладная, счет и т.д.)
+  supplier    String? // поставщик
+  batchNumber String? // номер партии
+  expiryDate  DateTime? // срок годности для этой партии
+  employeeId  String? // кто провел операцию
+  notes       String? // примечания
 
   stock     Stock    @relation(fields: [stockId], references: [id])
   createdAt DateTime @default(now())

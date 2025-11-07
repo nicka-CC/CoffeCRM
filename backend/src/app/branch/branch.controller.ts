@@ -16,9 +16,19 @@ export class BranchController {
     return this.branchService.findAll(query);
   }
 
+  @Get('map/points')
+  getMapPoints() {
+    return this.branchService.getMapPoints();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.branchService.findOne(id);
+  }
+
+  @Get(':id/details')
+  findDetails(@Param('id') id: string) {
+    return this.branchService.getBranchDetails(id);
   }
 
   @Patch(':id')

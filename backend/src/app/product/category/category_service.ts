@@ -43,16 +43,11 @@ export class CategoryService {
 
 
 
-  async get(status:string,page:number, limit:number) {
+  async get(page:number, limit:number) {
     const skip = (page - 1) * limit;
-    const filterCondition = status ? {
-      status:{
-        contains: `${status}`,
-      }
 
-    }:{};
-    const total = await this.prisma.product.count({});
-    const data = await this.prisma.product.findMany({
+    const total = await this.prisma.category.count({});
+    const data = await this.prisma.category.findMany({
       skip,
       take:limit,
     });

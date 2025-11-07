@@ -148,6 +148,45 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
                   Create Role
                 </Typography>
               </Link>
+              <Link href="/branches" style={{ textDecoration: 'none' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: pathname?.startsWith('/branches') ? '#6366f1' : 'text.secondary',
+                    borderBottom: pathname?.startsWith('/branches') ? '2px solid #6366f1' : 'none',
+                    pb: 0.5,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Branches
+                </Typography>
+              </Link>
+              <Link href="/products" style={{ textDecoration: 'none' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: pathname === '/products' ? '#6366f1' : 'text.secondary',
+                    borderBottom: pathname === '/products' ? '2px solid #6366f1' : 'none',
+                    pb: 0.5,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Products
+                </Typography>
+              </Link>
+              <Link href="/inventory" style={{ textDecoration: 'none' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: pathname === '/inventory' ? '#6366f1' : 'text.secondary',
+                    borderBottom: pathname === '/inventory' ? '2px solid #6366f1' : 'none',
+                    pb: 0.5,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Inventory
+                </Typography>
+              </Link>
             </Box>
 
             {/* Right Side Actions */}

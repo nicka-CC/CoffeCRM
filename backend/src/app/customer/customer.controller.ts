@@ -21,6 +21,11 @@ export class CustomerController {
     return this.customerService.findOne(id);
   }
 
+  @Get(':id/orders')
+  getOrderHistory(@Param('id') id: string) {
+    return this.customerService.getOrderHistory(id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateCustomerDto) {
     return this.customerService.update(id, dto);

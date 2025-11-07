@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma/prisma.service';
 import { CreateEmployeeDto, UpdateEmployeeDto } from '../../dto/employee.dto';
 
@@ -11,11 +11,58 @@ export class EmployeeService {
   }
 
   async findAll(query: any) {
-    return this.prisma.employee.findMany();
+    const branchId = query.branchId as string | undefined;
+    const search = query.search as string | undefined;
+
+    return this.prisma.employee.findMany({
+      where: {
+        branchId,
+        ...(search
+          ? {
+              user: {
+                fullName: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+            }
+          : {}),
+      },
+      include: {
+        user: true,
+        branch: true,
+        kpis: {
+          orderBy: {
+            date: 'desc',
+          },
+          take: 5,
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 
   async findOne(id: string) {
-    return this.prisma.employee.findUnique({ where: { id } });
+    const employee = await this.prisma.employee.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        branch: true,
+        kpis: {
+          orderBy: {
+            date: 'desc',
+          },
+        },
+      },
+    });
+
+    if (!employee) {
+      throw new NotFoundException(`Сотрудник с идентификатором ${id} не найден`);
+    }
+
+    return employee;
   }
 
   async update(id: string, dto: UpdateEmployeeDto) {
@@ -24,5 +71,73 @@ export class EmployeeService {
 
   async remove(id: string) {
     return this.prisma.employee.delete({ where: { id } });
+  }
+
+  async getKpi(id: string, period: 'week' | 'month' | 'quarter' = 'month') {
+    const employee = await this.prisma.employee.findUnique({ where: { id } });
+
+    if (!employee) {
+      throw new NotFoundException(`Сотрудник с идентификатором ${id} не найден`);
+    }
+
+    const { from, to } = this.resolvePeriod(period);
+
+    const kpis = await this.prisma.kpi.findMany({
+      where: {
+        employeeId: id,
+        date: {
+          gte: from,
+          lte: to,
+        },
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+
+    const metrics = kpis.reduce<Record<string, { total: number; count: number }>>(
+      (acc, kpi) => {
+        const current = acc[kpi.metric] ?? { total: 0, count: 0 };
+        current.total += kpi.value;
+        current.count += 1;
+        acc[kpi.metric] = current;
+        return acc;
+      },
+      {},
+    );
+
+    const aggregated = Object.entries(metrics).map(([metric, value]) => ({
+      metric,
+      total: value.total,
+      average: value.total / value.count,
+    }));
+
+    return {
+      period,
+      range: { from, to },
+      metrics: aggregated,
+      raw: kpis,
+    };
+  }
+
+  private resolvePeriod(period: 'week' | 'month' | 'quarter') {
+    const now = new Date();
+    const to = now;
+    const from = new Date(now);
+
+    switch (period) {
+      case 'quarter':
+        from.setMonth(now.getMonth() - 3);
+        break;
+      case 'week':
+        from.setDate(now.getDate() - 7);
+        break;
+      case 'month':
+      default:
+        from.setMonth(now.getMonth() - 1);
+        break;
+    }
+
+    return { from, to };
   }
 }

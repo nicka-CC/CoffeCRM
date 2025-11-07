@@ -94,14 +94,13 @@ export class CategoryController {
   @ApiOperation({ summary: "get category" })
   async filter(
     @Req() req: Request,
-    @Query('status') status: string,
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
   ) {
     const pageNumber = parseInt(page, 10);
     const pageSize = parseInt(limit, 10);
 
-    const result:any = await this.categoryService.get(status, pageNumber, pageSize);
+    const result:any = await this.categoryService.get( pageNumber, pageSize);
 
     return {
       total: result.total,
