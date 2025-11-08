@@ -7,7 +7,12 @@ export class CategoryService {
   constructor(private prisma: PrismaService) {}
 
   async create(dto: CreateCategoryDto) {
-    return this.prisma.category.create({ data: dto });
+    return this.prisma.category.create({
+      data: {
+        name: dto.name,
+        icon: dto.icon || null,
+      },
+    });
   }
 
   async findAll(query: any) {
@@ -19,7 +24,14 @@ export class CategoryService {
   }
 
   async update(id: string, dto: UpdateCategoryDto) {
-    return this.prisma.category.update({ where: { id }, data: dto });
+    const data: any = {};
+    if (dto.name !== undefined) {
+      data.name = dto.name;
+    }
+    if (dto.icon !== undefined) {
+      data.icon = dto.icon || null;
+    }
+    return this.prisma.category.update({ where: { id }, data });
   }
 
   async remove(id: string) {

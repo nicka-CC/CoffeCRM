@@ -73,7 +73,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/category`, {
+        const res = await fetch(`${API_BASE_URL}/categories`, {
           headers: withAuthHeaders(),
         });
         if (!res.ok) return;

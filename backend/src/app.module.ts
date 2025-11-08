@@ -13,6 +13,9 @@ import { EmployeeModule } from "./app/employee/employee.module";
 import { StockModule } from "./app/stock/stock.module";
 import { DashboardModule } from "./app/dashboard/dashboard.module";
 import { AnalyticsModule } from "./app/analytics/analytics.module";
+import { CategoryModule } from "./app/category/category.module";
+import { BookingModule } from "./app/booking/booking.module";
+import { SettingsModule } from "./app/settings/settings.module";
 
 @Module({
   imports: [
@@ -26,6 +29,9 @@ import { AnalyticsModule } from "./app/analytics/analytics.module";
     StockModule,
     DashboardModule,
     AnalyticsModule,
+    CategoryModule,
+    BookingModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [PrismaService, AppService],

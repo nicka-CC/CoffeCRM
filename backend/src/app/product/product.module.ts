@@ -4,14 +4,12 @@ import { PrismaService } from "../../../prisma/prisma/prisma.service";
 import { JwtModule } from "@nestjs/jwt";
 import {ProductController} from "./product/product.controller";
 import {ProductService} from "./product/product_service";
-import {CategoryController} from "./category/category.controller";
-import {CategoryService} from "./category/category_service";
 
 
 @Module({
   imports: [JwtModule.register({})],
-  controllers: [ProductController, CategoryController, ],
-  providers:[ProductService, PrismaService, CategoryService, ],
-  exports: [ProductService, CategoryService, ]
+  controllers: [ProductController],
+  providers:[ProductService, PrismaService],
+  exports: [ProductService]
 })
 export class ProductModule {}

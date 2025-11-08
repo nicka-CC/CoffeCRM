@@ -33,7 +33,25 @@ enum OrderStatus {
 enum BookingStatus {
   PENDING
   CONFIRMED
+  COMPLETED
   CANCELED
+  NO_SHOW
+}
+
+enum BookingType {
+  TABLE
+  EVENT
+  MEETING
+  PRIVATE
+  OTHER
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  ONLINE
+  BONUS
+  FREE
 }
 
 enum TransactionType {
@@ -66,11 +84,12 @@ model Employee {
   hiredAt  DateTime @default(now())
   kpis     Kpi[]
 
-  user      User     @relation(fields: [userId], references: [id])
-  branch    Branch?  @relation(fields: [branchId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  branch    Branch?   @relation(fields: [branchId], references: [id])
   branchId  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  bookings  Booking[] // бронирования, которые обслуживает сотрудник
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Kpi {
@@ -239,31 +258,88 @@ model OrderItem {
 }
 
 model Customer {
-  id       String    @id @default(uuid())
-  userId   String    @unique
-  bonus    Int       @default(0)
-  orders   Order[]
-  bookings Booking[]
+  id              String    @id @default(uuid())
+  userId          String    @unique
+  bonus           Int       @default(0) // текущий баланс бонусов
+  totalSpent      Float     @default(0) // общая сумма покупок
+  totalOrders     Int       @default(0) // общее количество заказов
+  averageCheck    Float?    // средний чек
+  lastOrderDate   DateTime? // дата последнего заказа
+  favoriteProduct String?   // любимый товар (productId)
+  favoriteBranch  String?   // любимый филиал (branchId)
+  discountPercent Float?    @default(0) // процент скидки
+  vipStatus       Boolean   @default(false) // VIP статус
+  notes           String?   // заметки о клиенте
+  tags            String[]  // теги для сегментации
+  source          String?   // источник (сайт, приложение, офлайн)
+  referralCode    String?   @unique // реферальный код
+  referredBy      String?   // кто привел (customerId)
+  birthday        DateTime? // день рождения
+  preferences     String?   // предпочтения (JSON)
+  orders          Order[]
+  bookings        Booking[]
+  bonusHistory    BonusTransaction[] // история бонусных операций
 
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Booking {
-  id         String        @id @default(uuid())
-  branchId   String
+model BonusTransaction {
+  id          String   @id @default(uuid())
   customerId String
-  date       DateTime
-  timeFrom   DateTime
-  timeTo     DateTime
-  type       String
-  status     BookingStatus @default(PENDING)
+  type        String   // EARNED, SPENT, EXPIRED, ADJUSTED
+  amount      Int       // количество бонусов
+  orderId     String?  // связанный заказ
+  description String?   // описание операции
+  expiresAt   DateTime? // срок действия бонусов
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
 
-  branch    Branch   @relation(fields: [branchId], references: [id])
-  customer  Customer @relation(fields: [customerId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Booking {
+  id              String        @id @default(uuid())
+  branchId        String
+  customerId      String
+  employeeId      String? // кто обслуживает
+  title           String? // название/описание
+  description     String? // описание события
+  date            DateTime // дата бронирования
+  timeFrom        DateTime // время начала
+  timeTo          DateTime // время окончания
+  duration        Int? // продолжительность в минутах
+  type            BookingType  @default(TABLE) // тип бронирования
+  status          BookingStatus @default(PENDING)
+  guestsCount     Int          @default(1) // количество гостей
+  tableNumber     String? // номер стола
+  contactName     String? // контактное имя (если не клиент)
+  contactPhone    String? // контактный телефон
+  contactEmail    String? // контактный email
+  specialRequests String? // особые пожелания
+  notes           String? // внутренние заметки
+  price           Float? // стоимость бронирования
+  deposit         Float? // предоплата
+  paymentMethod   PaymentMethod? // способ оплаты
+  isPaid          Boolean       @default(false) // оплачено ли
+  isConfirmed     Boolean       @default(false) // подтверждено клиентом
+  confirmationCode String? @unique // код подтверждения
+  reminderSent    Boolean       @default(false) // отправлено ли напоминание
+  reminderDate    DateTime? // когда отправить напоминание
+  cancelledAt     DateTime? // когда отменено
+  cancelledBy     String? // кто отменил (userId)
+  cancellationReason String? // причина отмены
+  completedAt     DateTime? // когда завершено
+  recurrenceRule  String? // правило повтора (RRULE format)
+  parentBookingId String? // ID родительского бронирования для повторяющихся
+  source          String? // источник бронирования (сайт, телефон, приложение)
+  tags            String[] // теги для фильтрации
+
+  branch    Branch    @relation(fields: [branchId], references: [id])
+  customer  Customer  @relation(fields: [customerId], references: [id])
+  employee  Employee? @relation(fields: [employeeId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Report {
@@ -276,36 +352,77 @@ model Report {
 }
 
 model Company {
-  id          String   @id @default(uuid())
-  icon        String?
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
+  id              String   @id @default(uuid())
+  icon            String?
+  name            String
+  description     String?
+  legalName       String?  // юридическое название
+  inn             String?  // ИНН
+  kpp             String?  // КПП
+  ogrn            String?  // ОГРН
+  address         String?  // юридический адрес
+  actualAddress   String?  // фактический адрес
+  phone           String?  // телефон
+  email           String?  // email
+  website         String?  // сайт
+  director        String?  // директор
+  accountant      String?  // бухгалтер
+  bankName        String?  // банк
+  bankAccount     String?  // расчетный счет
+  bankBik         String?  // БИК
+  taxSystem       String?  // система налогообложения
+  logo            String?  // логотип
+  settings        String?  // настройки (JSON)
+  timezone        String   @default("Europe/Moscow")
+  currency        String   @default("RUB")
+  language        String   @default("ru")
+  createdAt       DateTime @default(now())
 
   PaymentSettings PaymentSettings[]
-
-  Integration Integration[]
-  updatedAt   DateTime      @updatedAt
+  Integration     Integration[]
+  updatedAt       DateTime @updatedAt
 }
 
 model PaymentSettings {
-  id        String   @id @default(uuid())
-  icon      String?
-  provider  String
-  apiKey    String
-  companyId String   @unique
-  company   Company  @relation(fields: [companyId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  icon        String?
+  provider    String   // SBERBANK, YOOKASSA, TINKOFF, etc.
+  name        String?  // название настройки
+  apiKey      String   // API ключ
+  secretKey   String?  // секретный ключ
+  merchantId  String?  // ID мерчанта
+  terminalId  String?  // ID терминала
+  isActive    Boolean  @default(true)
+  isTest      Boolean  @default(false) // тестовый режим
+  commission  Float?   // комиссия в процентах
+  minAmount   Float?   // минимальная сумма
+  maxAmount   Float?   // максимальная сумма
+  webhookUrl  String?  // URL для webhook
+  settings    String?  // дополнительные настройки (JSON)
+  companyId   String   @unique
+  company     Company  @relation(fields: [companyId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Integration {
-  id        String   @id @default(uuid())
-  icon      String?
-  name      String
-  apiKey    String?
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  icon        String?
+  name        String   // название интеграции
+  type        String   // тип (CRM, ACCOUNTING, DELIVERY, SMS, EMAIL, etc.)
+  provider    String?  // провайдер (AMOCRM, 1C, etc.)
+  apiKey      String?  // API ключ
+  apiSecret   String?  // секретный ключ
+  apiUrl      String?  // URL API
+  webhookUrl  String?  // URL для webhook
+  isActive    Boolean  @default(true)
+  isTest      Boolean  @default(false)
+  settings    String?  // настройки (JSON)
+  lastSyncAt  DateTime? // последняя синхронизация
+  syncStatus  String?  // статус синхронизации
+  errorMessage String? // сообщение об ошибке
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

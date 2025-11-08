@@ -187,6 +187,97 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
                   Inventory
                 </Typography>
               </Link>
+              <Link href="/orders" style={{ textDecoration: 'none' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: pathname?.startsWith('/orders') ? '#6366f1' : 'text.secondary',
+                    borderBottom: pathname?.startsWith('/orders') ? '2px solid #6366f1' : 'none',
+                    pb: 0.5,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Orders
+                </Typography>
+              </Link>
+              <Link href="/employees" style={{ textDecoration: 'none' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: pathname?.startsWith('/employees') ? '#6366f1' : 'text.secondary',
+                    borderBottom: pathname?.startsWith('/employees') ? '2px solid #6366f1' : 'none',
+                    pb: 0.5,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Employees
+                </Typography>
+              </Link>
+              <Link href="/categories" style={{ textDecoration: 'none' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: pathname === '/categories' ? '#6366f1' : 'text.secondary',
+                    borderBottom: pathname === '/categories' ? '2px solid #6366f1' : 'none',
+                    pb: 0.5,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Categories
+                </Typography>
+              </Link>
+              <Link href="/bookings" style={{ textDecoration: 'none' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: pathname?.startsWith('/bookings') ? '#6366f1' : 'text.secondary',
+                    borderBottom: pathname?.startsWith('/bookings') ? '2px solid #6366f1' : 'none',
+                    pb: 0.5,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Bookings
+                </Typography>
+              </Link>
+              <Link href="/customers" style={{ textDecoration: 'none' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: pathname?.startsWith('/customers') ? '#6366f1' : 'text.secondary',
+                    borderBottom: pathname?.startsWith('/customers') ? '2px solid #6366f1' : 'none',
+                    pb: 0.5,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Customers
+                </Typography>
+              </Link>
+              <Link href="/analytics" style={{ textDecoration: 'none' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: pathname?.startsWith('/analytics') ? '#6366f1' : 'text.secondary',
+                    borderBottom: pathname?.startsWith('/analytics') ? '2px solid #6366f1' : 'none',
+                    pb: 0.5,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Analytics
+                </Typography>
+              </Link>
+              <Link href="/settings" style={{ textDecoration: 'none' }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: pathname?.startsWith('/settings') ? '#6366f1' : 'text.secondary',
+                    borderBottom: pathname?.startsWith('/settings') ? '2px solid #6366f1' : 'none',
+                    pb: 0.5,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Settings
+                </Typography>
+              </Link>
             </Box>
 
             {/* Right Side Actions */}

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { OrderStatus } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma/prisma.service';
-import ExcelJS from 'exceljs';
+import * as ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
 
 type AnalyticsPeriod = 'week' | 'month' | 'quarter' | 'custom';

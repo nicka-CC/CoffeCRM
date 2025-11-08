@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma/prisma.service';
+import { OrderStatus } from '@prisma/client';
 
 type DashboardPeriod = 'day' | 'week' | 'month';
 type ChartGranularity = 'hour' | 'day' | 'week';
@@ -11,31 +12,89 @@ export class DashboardService {
   async getDashboardSummary(period: DashboardPeriod = 'day') {
     const { from, to, granularity } = this.resolvePeriod(period);
 
-    const orders = await this.prisma.order.findMany({
-      where: {
-        createdAt: {
-          gte: from,
-          lte: to,
-        },
-      },
-      include: {
-        items: {
-          include: {
-            product: true,
+    const [orders, customers, products, branches, bookings] = await Promise.all([
+      this.prisma.order.findMany({
+        where: {
+          createdAt: {
+            gte: from,
+            lte: to,
           },
         },
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    });
+        include: {
+          items: {
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  price: true,
+                  icon: true,
+                },
+              },
+            },
+          },
+          branch: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          customer: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  fullName: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      }),
+      this.prisma.customer.count({
+        where: {
+          createdAt: {
+            gte: from,
+            lte: to,
+          },
+        },
+      }),
+      this.prisma.product.count({
+        where: {
+          isActive: true,
+        },
+      }),
+      this.prisma.branch.count({
+        where: {
+          isActive: true,
+        },
+      }),
+      this.prisma.booking.count({
+        where: {
+          date: {
+            gte: from,
+            lte: to,
+          },
+          status: {
+            not: 'CANCELED',
+          },
+        },
+      }),
+    ]);
 
-    const revenue = orders.reduce((acc, order) => acc + order.total, 0);
+    const completedOrders = orders.filter((o) => o.status === OrderStatus.COMPLETED);
+    const revenue = completedOrders.reduce((acc, order) => acc + order.total, 0);
     const ordersCount = orders.length;
-    const averageCheck = ordersCount > 0 ? revenue / ordersCount : 0;
+    const completedOrdersCount = completedOrders.length;
+    const averageCheck = completedOrdersCount > 0 ? revenue / completedOrdersCount : 0;
 
     const topProducts = this.calculateTopProducts(orders);
     const salesChart = this.buildSalesChart(orders, from, to, granularity);
+    const branchStats = this.calculateBranchStats(orders);
+    const statusDistribution = this.calculateStatusDistribution(orders);
 
     return {
       period,
@@ -46,10 +105,17 @@ export class DashboardService {
       kpis: {
         revenue,
         ordersCount,
+        completedOrdersCount,
         averageCheck,
+        newCustomers: customers,
+        activeProducts: products,
+        activeBranches: branches,
+        bookings,
       },
       topProducts,
       salesChart,
+      branchStats,
+      statusDistribution,
       quickLinks: this.getQuickLinks(),
     };
   }
@@ -79,18 +145,19 @@ export class DashboardService {
     return { from, to, granularity };
   }
 
-  private calculateTopProducts(orders: Array<{
-    items: Array<{
-      quantity: number;
-      price: number;
-      product: {
-        id: string;
-        name: string;
-        imageUrl?: string | null;
-        icon?: string | null;
-      };
-    }>;
-  }>) {
+  private calculateTopProducts(
+    orders: Array<{
+      items: Array<{
+        quantity: number;
+        price: number;
+        product: {
+          id: string;
+          name: string;
+          icon?: string | null;
+        };
+      }>;
+    }>,
+  ) {
     const productMap = new Map<
       string,
       {
@@ -98,7 +165,6 @@ export class DashboardService {
         name: string;
         quantity: number;
         revenue: number;
-        imageUrl: string | null;
         icon: string | null;
       }
     >();
@@ -116,7 +182,6 @@ export class DashboardService {
             name: item.product.name,
             quantity: item.quantity,
             revenue: item.price * item.quantity,
-            imageUrl: item.product.imageUrl ?? null,
             icon: item.product.icon ?? null,
           });
         }
@@ -129,10 +194,10 @@ export class DashboardService {
   }
 
   private buildSalesChart(
-    orders: Array<{ createdAt: Date; total: number }>,
+    orders: Array<{ createdAt: Date; total: number; status: OrderStatus }>,
     from: Date,
     to: Date,
-    granularity: ChartGranularity
+    granularity: ChartGranularity,
   ) {
     const buckets = new Map<string, { label: string; revenue: number; orders: number }>();
 
@@ -154,16 +219,74 @@ export class DashboardService {
       this.advanceCursor(cursor, granularity);
     }
 
-    orders.forEach((order) => {
-      const key = this.getBucketKey(order.createdAt, granularity);
-      const bucket = buckets.get(key);
-      if (bucket) {
-        bucket.revenue += order.total;
-        bucket.orders += 1;
-      }
-    });
+    orders
+      .filter((o) => o.status === OrderStatus.COMPLETED)
+      .forEach((order) => {
+        const key = this.getBucketKey(order.createdAt, granularity);
+        const bucket = buckets.get(key);
+        if (bucket) {
+          bucket.revenue += order.total;
+          bucket.orders += 1;
+        }
+      });
 
     return Array.from(buckets.values());
+  }
+
+  private calculateBranchStats(
+    orders: Array<{
+      branch: { id: string; name: string };
+      total: number;
+      status: OrderStatus;
+    }>,
+  ) {
+    const branchMap = new Map<
+      string,
+      {
+        branchId: string;
+        name: string;
+        revenue: number;
+        orders: number;
+      }
+    >();
+
+    orders
+      .filter((o) => o.status === OrderStatus.COMPLETED)
+      .forEach((order) => {
+        const existing = branchMap.get(order.branch.id);
+        if (existing) {
+          existing.revenue += order.total;
+          existing.orders += 1;
+        } else {
+          branchMap.set(order.branch.id, {
+            branchId: order.branch.id,
+            name: order.branch.name,
+            revenue: order.total,
+            orders: 1,
+          });
+        }
+      });
+
+    return Array.from(branchMap.values()).sort((a, b) => b.revenue - a.revenue);
+  }
+
+  private calculateStatusDistribution(orders: Array<{ status: OrderStatus }>) {
+    const distribution: Record<OrderStatus, number> = {
+      NEW: 0,
+      IN_PROGRESS: 0,
+      READY: 0,
+      COMPLETED: 0,
+      CANCELED: 0,
+    };
+
+    orders.forEach((order) => {
+      distribution[order.status] = (distribution[order.status] || 0) + 1;
+    });
+
+    return Object.entries(distribution).map(([status, count]) => ({
+      status,
+      count,
+    }));
   }
 
   private getBucketKey(date: Date, granularity: ChartGranularity) {
@@ -202,25 +325,40 @@ export class DashboardService {
     return [
       {
         title: 'Создать заказ',
-        icon: 'plus',
+        icon: 'shopping-cart',
         url: '/orders/new',
+        action: 'createOrder',
       },
       {
         title: 'Добавить товар',
         icon: 'coffee',
         url: '/products/new',
+        action: 'createProduct',
       },
       {
         title: 'Пополнить склад',
         icon: 'truck',
         url: '/inventory/inbound',
+        action: 'addStock',
       },
       {
         title: 'Новый сотрудник',
         icon: 'user-plus',
         url: '/employees/new',
+        action: 'createEmployee',
+      },
+      {
+        title: 'Создать бронирование',
+        icon: 'calendar',
+        url: '/bookings/new',
+        action: 'createBooking',
+      },
+      {
+        title: 'Новый клиент',
+        icon: 'users',
+        url: '/customers/new',
+        action: 'createCustomer',
       },
     ];
   }
 }
-
