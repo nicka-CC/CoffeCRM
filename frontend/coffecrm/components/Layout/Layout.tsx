@@ -21,6 +21,7 @@ import {
 import Link from 'next/link';
 import {usePathname, useRouter} from 'next/navigation';
 import Sidebar from './Sidebar';
+import { useSidebar } from './SidebarContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -29,9 +30,9 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const pathname = usePathname();
+  const { collapsed } = useSidebar();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -58,23 +59,18 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
   return (
     <Box sx={{ display: 'flex', backgroundColor:'white' }}>
       {/* Sidebar */}
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar open={true} onClose={() => {}} />
       
       {/* Main Content */}
-      <Box component="main" sx={{ flexGrow: 1, minHeight: '100%' }}>
+      <Box component="main" sx={{ 
+        flexGrow: 1, 
+        minHeight: '100%',
+        marginLeft: collapsed ? '72px' : '260px',
+        transition: 'margin-left 0.3s ease',
+      }}>
         {/* Top App Bar */}
         <AppBar position="static" sx={{ backgroundColor: 'white', color: 'black', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}>
           <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              onClick={() => setSidebarOpen(true)}
-              sx={{  }}
-            >
-              <MenuIcon />
-            </IconButton>
-
             {/* Logo */}
             <Box sx={{ display: 'flex', alignItems: 'center', mr: 4 }}>
               <Box sx={{

@@ -51,6 +51,7 @@ import {
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSidebar } from './SidebarContext';
 
 interface SidebarProps {
   open: boolean;
@@ -59,8 +60,8 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const pathname = usePathname();
+  const { collapsed, setCollapsed } = useSidebar();
   const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({});
-  const [collapsed, setCollapsed] = useState(false);
   // Для каскадных popover
   const [popoverStack, setPopoverStack] = useState<Array<{
     anchor: HTMLElement;
@@ -77,7 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   };
 
   const handleCollapseToggle = () => {
-    setCollapsed((prev) => !prev);
+    setCollapsed(!collapsed);
     setExpandedItems({});
     // popoverAnchor больше не используется
   };
@@ -306,12 +307,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   return (
     <>
       <Drawer
-        variant="temporary"
-        open={open}
-        onClose={onClose}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile
-        }}
+        variant="permanent"
         sx={{
           display: { xs: 'block', sm: 'block' },
           '& .MuiDrawer-paper': {
@@ -321,7 +317,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
             boxShadow: '0 2px 16px 0 rgba(60,72,100,0.08)',
             borderRight: '1px solid #f0f1f7',
             overflowX: 'hidden',
-            transition: 'width 0.2s',
+            transition: 'width 0.3s ease',
+            position: 'fixed',
+            height: '100vh',
+            zIndex: 1100,
           },
         }}
       >
@@ -334,7 +333,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
           </IconButton>
         </Box>
         <Divider />
-        <Box sx={{ pt: 1, pb: 1 }}>
+        <Box sx={{ pt: 1, pb: 1, overflowY: 'auto', overflowX: 'hidden', height: 'calc(100vh - 80px)' }}>
           {sidebarSections.map(section => (
             <React.Fragment key={section.header}>
               {!collapsed && renderSectionHeader(section.header)}
@@ -354,7 +353,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         )}
       </Drawer>
       {/* Overlay для popover */}
-      <Backdrop open={popoverStack.length > 0} sx={{ zIndex: 1200 }} onClick={() => handlePopoverClose(0)} />
+      {popoverStack.length > 0 && <Backdrop open={true} sx={{ zIndex: 1200 }} onClick={() => handlePopoverClose(0)} />}
       {/* Каскадные popover */}
       {popoverStack.map((popover, idx) => (
         <Popover
@@ -364,7 +363,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
           onClose={() => handlePopoverClose(idx)}
           anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
           transformOrigin={{ vertical: 'center', horizontal: 'left' }}
-          PaperProps={{ sx: { minWidth: 180, p: 1, ml: idx * 2 } }}
+          PaperProps={{ sx: { minWidth: 180, p: 1, ml: idx * 2, zIndex: 1300 } }}
         >
           <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>{popover.title}</Typography>
           <List>
