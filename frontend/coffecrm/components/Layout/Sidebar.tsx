@@ -35,8 +35,19 @@ import {
   Store,
   Info,
   Coffee,
-  Inventory, Warehouse,
-  Delete, LocalShipping, Person, Star, VpnKey, Download, CalendarToday, Description,
+  Inventory2 as Inventory,
+  Warehouse,
+  Delete,
+  LocalShipping,
+  Person,
+  Star,
+  VpnKey,
+  Download,
+  CalendarToday,
+  Description,
+  Category,
+  Group,
+  Assignment,
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -92,105 +103,72 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   // Sidebar sections and items for a modern, clean look
   const sidebarSections = [
     {
-      header: 'Авторизация',
+      header: 'Основное',
       items: [
-        { title: 'Логин', icon: <Login />, path: '/auth/login' },
-        { title: 'Регистрация', icon: <PersonAdd />, path: '/auth/register' },
-        { title: 'Роли', icon: <Security />, path: '/auth/roles' },
+        { title: 'Dashboard', icon: <Dashboard />, path: '/' },
       ],
     },
     {
-      header: 'Dashboard',
+      header: 'Пользователи и роли',
       items: [
-        { title: 'Статистика дня', icon: <Dashboard />, path: '/dashboard/daily-stats' },
-        { title: 'Графики продаж', icon: <TrendingUp />, path: '/dashboard/sales-charts' },
-        { title: 'Быстрые действия', icon: <FlashOn />, path: '/dashboard/quick-actions' },
+        { title: 'Users', icon: <People />, path: '/users' },
+        { title: 'Roles', icon: <Security />, path: '/roles' },
+        { title: 'Create Role', icon: <PersonAdd />, path: '/roles/create' },
       ],
     },
     {
       header: 'Филиалы',
       items: [
-        { title: 'Список филиалов', icon: <Store />, path: '/branches/list' },
-        { title: 'Карта', icon: <Store />, path: '/branches/map' },
-        {
-          title: 'Детали филиала',
-          icon: <Info />,
-          path: '/branches/details',
-          expandable: true,
-          key: 'branches-details',
-          children: [
-            { title: 'Сотрудники', path: '/branches/details/staff' },
-            { title: 'Продажи', path: '/branches/details/sales' },
-            { title: 'Запасы', path: '/branches/details/inventory' },
-          ],
-        },
+        { title: 'Branches', icon: <Store />, path: '/branches' },
       ],
     },
     {
-      header: 'Товары и меню',
+      header: 'Товары',
       items: [
-        { title: 'Список товаров', icon: <Coffee />, path: '/menu/products' },
-        { title: 'Категории', icon: <List />, path: '/menu/categories' },
-        { title: 'Остатки по филиалам', icon: <Inventory />, path: '/menu/branch-inventory' },
+        { title: 'Products', icon: <Coffee />, path: '/products' },
+        { title: 'Categories', icon: <Category />, path: '/categories' },
       ],
     },
     {
       header: 'Склад',
       items: [
-        { title: 'Остатки', icon: <Warehouse />, path: '/warehouse/inventory' },
-        { title: 'Приход/Расход', icon: <LocalShipping />, path: '/warehouse/transactions' },
-        { title: 'Списание', icon: <Delete />, path: '/warehouse/write-off' },
+        { title: 'Inventory', icon: <Inventory />, path: '/inventory' },
       ],
     },
     {
       header: 'Заказы',
       items: [
-        { title: 'Таблица заказов', icon: <ShoppingCart />, path: '/orders/list' },
-        { title: 'Статусы', icon: <List />, path: '/orders/statuses' },
-        { title: 'Детали заказа', icon: <Info />, path: '/orders/details' },
+        { title: 'Orders', icon: <ShoppingCart />, path: '/orders' },
       ],
     },
     {
       header: 'Клиенты',
       items: [
-        { title: 'Список', icon: <Person />, path: '/customers/list' },
-        { title: 'История заказов', icon: <List />, path: '/customers/order-history' },
-        { title: 'Бонусы', icon: <Star />, path: '/customers/bonuses' },
+        { title: 'Customers', icon: <Person />, path: '/customers' },
       ],
     },
     {
       header: 'Сотрудники',
       items: [
-        { title: 'Список сотрудников', icon: <People />, path: '/staff/list' },
-        { title: 'Роли и доступы', icon: <VpnKey />, path: '/staff/roles' },
-        { title: 'KPI', icon: <Assessment />, path: '/staff/kpi' },
-      ],
-    },
-    {
-      header: 'Аналитика',
-      items: [
-        { title: 'Продажи по периодам', icon: <TrendingUp />, path: '/analytics/sales-periods' },
-        { title: 'ТОП товаров/клиентов', icon: <Star />, path: '/analytics/top' },
-        { title: 'По филиалам', icon: <Store />, path: '/analytics/branches' },
-        { title: 'Экспорт Excel/PDF', icon: <Download />, path: '/analytics/export' },
-      ],
-    },
-    {
-      header: 'Настройки',
-      items: [
-        { title: 'Компания', icon: <Settings />, path: '/settings/company' },
-        { title: 'Платежи', icon: <Payment />, path: '/settings/payments' },
-        { title: 'Интеграции', icon: <Settings />, path: '/settings/integrations' },
+        { title: 'Employees', icon: <Group />, path: '/employees' },
       ],
     },
     {
       header: 'Бронирования',
       items: [
-        { title: 'Список бронирований', icon: <CalendarToday />, path: '/reservations/list' },
-        { title: 'Календарь', icon: <CalendarToday />, path: '/reservations/calendar' },
-        { title: 'Детали бронирования', icon: <Info />, path: '/reservations/details' },
-        { title: 'Управление', icon: <Settings />, path: '/reservations/management' },
-        { title: 'Отчёты', icon: <Description />, path: '/reservations/reports' },
+        { title: 'Bookings', icon: <CalendarToday />, path: '/bookings' },
+      ],
+    },
+    {
+      header: 'Аналитика',
+      items: [
+        { title: 'Analytics', icon: <TrendingUp />, path: '/analytics' },
+      ],
+    },
+    {
+      header: 'Настройки',
+      items: [
+        { title: 'Settings', icon: <Settings />, path: '/settings' },
       ],
     },
   ];
@@ -217,7 +195,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   // Render a sidebar item (with or without children)
   const renderSidebarItem = (item: any, level = 0) => {
     const isExpanded = expandedItems[item.key] || false;
-    const isActive = pathname === item.path;
+    // Проверяем активный путь: точное совпадение или начинается с пути (для вложенных страниц)
+    const isActive = item.path === '/' 
+      ? pathname === '/' 
+      : pathname === item.path || pathname?.startsWith(item.path + '/');
     const paddingLeft = level === 0 ? 2 : 4;
 
     // Mini mode: only icons, show popover for expandable
@@ -325,11 +306,14 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   return (
     <>
       <Drawer
-        variant="permanent"
+        variant="temporary"
         open={open}
+        onClose={onClose}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile
+        }}
         sx={{
-          width: collapsed ? 72 : 260,
-          flexShrink: 0,
+          display: { xs: 'block', sm: 'block' },
           '& .MuiDrawer-paper': {
             width: collapsed ? 72 : 260,
             boxSizing: 'border-box',

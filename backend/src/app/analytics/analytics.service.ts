@@ -334,6 +334,7 @@ export class AnalyticsService {
   }
 
   private async generateExcel(title: string, rows: Array<Record<string, unknown>>) {
+    // @ts-ignore
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Report');
 

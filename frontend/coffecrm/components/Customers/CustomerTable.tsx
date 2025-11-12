@@ -124,3 +124,5 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
 
 export default CustomerTable;
 
+
+

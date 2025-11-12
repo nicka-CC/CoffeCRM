@@ -336,3 +336,5 @@ const CompanySettings: React.FC = () => {
 
 export default CompanySettings;
 
+
+
