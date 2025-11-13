@@ -13,35 +13,51 @@ export class EmployeeService {
   async findAll(query: any) {
     const branchId = query.branchId as string | undefined;
     const search = query.search as string | undefined;
+    const page = query.page ? Number(query.page) : undefined;
+    const limit = query.limit ? Number(query.limit) : undefined;
+    const take = limit;
+    const skip = page && limit ? (page - 1) * limit : undefined;
 
-    return this.prisma.employee.findMany({
-      where: {
-        branchId,
-        ...(search
-          ? {
-              user: {
-                fullName: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
+    const where = {
+      ...(branchId ? { branchId } : {}),
+      ...(search
+        ? {
+            user: {
+              fullName: {
+                contains: search,
+                mode: 'insensitive',
               },
-            }
-          : {}),
-      },
-      include: {
-        user: true,
-        branch: true,
-        kpis: {
-          orderBy: {
-            date: 'desc',
+            },
+          }
+        : {}),
+    } as any;
+
+    const [employees, total] = await this.prisma.$transaction([
+      this.prisma.employee.findMany({
+        where,
+        include: {
+          user: true,
+          branch: true,
+          kpis: {
+            orderBy: {
+              date: 'desc',
+            },
+            take: 5,
           },
-          take: 5,
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+        orderBy: { createdAt: 'desc' },
+        take,
+        skip,
+      }),
+      this.prisma.employee.count({ where }),
+    ]);
+
+    return {
+      data: employees,
+      total,
+      page: page ?? (skip !== undefined && take ? Math.floor(skip / take) + 1 : 1),
+      limit: take,
+    };
   }
 
   async findOne(id: string) {

@@ -10,10 +10,11 @@ import {
   Button,
   Grid,
   Box,
-  Avatar,
+  Avatar, Typography,
 } from '@mui/material';
 import type { Category, CreateCategoryDto, UpdateCategoryDto } from '@/types/categories';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
+import { usePermissions } from '@/components/hooks/usePermissions';
 
 interface CategoryFormProps {
   open: boolean;
@@ -29,6 +30,9 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ open, onClose, onSuccess, c
     name: '',
     icon: '',
   });
+
+  const { canEditResource } = usePermissions();
+  const editable = canEditResource('category', category?.id);
 
   useEffect(() => {
     if (category) {
@@ -97,6 +101,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ open, onClose, onSuccess, c
                 value={form.name}
                 onChange={handleChange}
                 fullWidth
+                disabled={!editable}
               />
             </Grid>
             <Grid item xs={12}>
@@ -107,6 +112,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ open, onClose, onSuccess, c
                 onChange={handleChange}
                 fullWidth
                 placeholder="https://..."
+                disabled={!editable}
               />
             </Grid>
             {form.icon && (
@@ -123,7 +129,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ open, onClose, onSuccess, c
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Отмена</Button>
-          <Button type="submit" variant="contained" disabled={loading}>
+          <Button type="submit" variant="contained" disabled={loading || !editable}>
             {isEdit ? 'Сохранить' : 'Создать'}
           </Button>
         </DialogActions>

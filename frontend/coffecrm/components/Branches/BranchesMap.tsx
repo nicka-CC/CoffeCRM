@@ -1,16 +1,8 @@
 'use client';
 
-import React, { useMemo, useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import type { BranchSummary } from '@/types/branches';
-
-const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
-const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
-const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
-const Popup = dynamic(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
-
-import 'leaflet/dist/leaflet.css';
 
 interface BranchesMapProps {
   branches: BranchSummary[];
@@ -18,38 +10,95 @@ interface BranchesMapProps {
 
 const DEFAULT_POSITION: [number, number] = [55.751244, 37.618423];
 
-const BranchesMap: React.FC<BranchesMapProps> = ({ branches }) => {
-  const [isClient, setIsClient] = useState(false);
+function loadYandexScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === 'undefined') return reject(new Error('no window'));
+    if ((window as any).ymaps) return resolve();
 
-  useEffect(() => {
-    setIsClient(true);
-    
-    if (typeof window !== 'undefined') {
-      import('leaflet').then((L) => {
-        delete (L.Icon.Default.prototype as any)._getIconUrl;
-        L.Icon.Default.mergeOptions({
-          iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-          iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-        });
-      });
-    }
-  }, []);
+    const script = document.createElement('script');
+    script.src = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
+    script.type = 'text/javascript';
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Failed to load Yandex Maps script'));
+    document.head.appendChild(script);
+  });
+}
+
+const BranchesMap: React.FC<BranchesMapProps> = ({ branches }) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<any>(null);
+  const [isClient, setIsClient] = useState(false);
 
   const positions = useMemo(
     () =>
       branches
-        .filter((branch) => typeof branch.latitude === 'number' && typeof branch.longitude === 'number')
-        .map((branch) => ({
-          id: branch.id,
-          name: branch.name,
-          latitude: branch.latitude as number,
-          longitude: branch.longitude as number,
-          address: branch.address,
-          city: branch.city,
+        .filter((b) => typeof b.latitude === 'number' && typeof b.longitude === 'number')
+        .map((b) => ({
+          id: b.id,
+          name: b.name,
+          latitude: b.latitude as number,
+          longitude: b.longitude as number,
+          address: b.address,
+          city: b.city,
         })),
     [branches],
   );
+
+  useEffect(() => {
+    setIsClient(true);
+
+    let mounted = true;
+
+    (async () => {
+      try {
+        await loadYandexScript();
+        if (!mounted) return;
+        const ymaps = (window as any).ymaps;
+        await ymaps.ready();
+
+        const center: [number, number] = positions.length > 0 ? [positions[0].latitude, positions[0].longitude] : DEFAULT_POSITION;
+
+        // create map if not exists
+        if (!mapRef.current && containerRef.current) {
+          mapRef.current = new ymaps.Map(containerRef.current, {
+            center: center,
+            zoom: 12,
+            controls: ['zoomControl', 'typeSelector', 'fullscreenControl'],
+          });
+        }
+
+        // clear existing geoObjects
+        if (mapRef.current) {
+          mapRef.current.geoObjects.removeAll();
+        }
+
+        // add placemarks
+        positions.forEach((pos) => {
+          const placemark = new ymaps.Placemark([pos.latitude, pos.longitude], {
+            hintContent: pos.name,
+            balloonContentBody: `<div style="font-weight:600;margin-bottom:6px;">${pos.name}</div><div>${pos.address ?? ''}</div><div style="color:#666">${pos.city ?? ''}</div>`,
+          });
+          mapRef.current.geoObjects.add(placemark);
+        });
+
+        // adjust bounds if multiple
+        if (positions.length > 1 && mapRef.current) {
+          const bounds = mapRef.current.geoObjects.getBounds();
+          if (bounds) mapRef.current.setBounds(bounds, { checkZoomRange: true, zoomMargin: 40 });
+        } else if (mapRef.current) {
+          mapRef.current.setCenter(center);
+        }
+      } catch (err) {
+        // fall back silently; map will show empty state below
+        console.error('Yandex maps load error', err);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [positions]);
 
   if (!isClient) {
     return (
@@ -74,29 +123,9 @@ const BranchesMap: React.FC<BranchesMapProps> = ({ branches }) => {
     );
   }
 
-  const center = positions.length > 0 ? [positions[0].latitude, positions[0].longitude] : DEFAULT_POSITION;
-
   return (
     <Box sx={{ position: 'relative', width: '100%', height: 400, borderRadius: 2, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
-      <MapContainer center={center as [number, number]} zoom={12} style={{ height: '100%', width: '100%' }}>
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {positions.map((branch) => (
-          <Marker key={branch.id} position={[branch.latitude, branch.longitude] as [number, number]}>
-            <Popup>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {branch.name}
-              </Typography>
-              <Typography variant="body2">{branch.address}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                {branch.city}
-              </Typography>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+      <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
     </Box>
   );
 };

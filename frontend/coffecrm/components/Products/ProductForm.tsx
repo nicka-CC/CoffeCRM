@@ -23,6 +23,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
 import type { ProductListItem } from '@/types/products';
+import { usePermissions } from '@/components/hooks/usePermissions';
 
 interface CategoryOption {
   id: string;
@@ -68,7 +69,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
     isNew: false,
     sortOrder: '0',
     tags: '',
+    isIngredient: false,
   });
+
+  const { canEditResource } = usePermissions();
+  const editable = canEditResource('product', product?.id);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -110,6 +115,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
         shelfLife: product.shelfLife?.toString() ?? '',
         storageTemp: product.storageTemp ?? '',
         isActive: product.isActive ?? true,
+        isIngredient: product.isIngredient ?? false,
         isPopular: product.isPopular ?? false,
         isNew: product.isNew ?? false,
         sortOrder: product.sortOrder?.toString() ?? '0',
@@ -143,6 +149,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
         isNew: false,
         sortOrder: '0',
         tags: '',
+        isIngredient: false,
       });
       setFile(null);
       setPreview(null);
@@ -193,6 +200,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
       if (form.allergens) formData.append('allergens', form.allergens);
       if (form.shelfLife) formData.append('shelfLife', form.shelfLife);
       if (form.storageTemp) formData.append('storageTemp', form.storageTemp);
+      formData.append('isIngredient', String(form.isIngredient));
       formData.append('isActive', String(form.isActive));
       formData.append('isPopular', String(form.isPopular));
       formData.append('isNew', String(form.isNew));
@@ -254,10 +262,10 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
             <AccordionDetails>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <TextField required label="Название" name="name" value={form.name} onChange={handleChange} fullWidth />
+                  <TextField required label="Название" name="name" value={form.name} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField label="Название на английском" name="nameEn" value={form.nameEn} onChange={handleChange} fullWidth />
+                  <TextField label="Название на английском" name="nameEn" value={form.nameEn} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
@@ -268,6 +276,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
                     value={form.categoryId}
                     onChange={handleChange}
                     fullWidth
+                    disabled={!editable}
                   >
                     {categories.map((category) => (
                       <MenuItem key={category.id} value={category.id}>
@@ -278,7 +287,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
                 </Grid>
                 <Grid item xs={12}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Button variant="outlined" component="label">
+                    <Button variant="outlined" component="label" disabled={!editable}>
                       Загрузить изображение
                       <input hidden accept="image/*" type="file" onChange={handleFileChange} />
                     </Button>
@@ -286,7 +295,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
                   </Box>
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField label="Описание" name="description" value={form.description} onChange={handleChange} multiline minRows={3} fullWidth />
+                  <TextField label="Описание" name="description" value={form.description} onChange={handleChange} multiline minRows={3} fullWidth disabled={!editable} />
                 </Grid>
               </Grid>
             </AccordionDetails>
@@ -301,22 +310,22 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
             <AccordionDetails>
               <Grid container spacing={2}>
                 <Grid item xs={4}>
-                  <TextField required label="Цена" name="price" type="number" inputProps={{ min: 0, step: 0.01 }} value={form.price} onChange={handleChange} fullWidth />
+                  <TextField required label="Цена" name="price" type="number" inputProps={{ min: 0, step: 0.01 }} value={form.price} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={4}>
-                  <TextField label="Себестоимость" name="cost" type="number" inputProps={{ min: 0, step: 0.01 }} value={form.cost} onChange={handleChange} fullWidth />
+                  <TextField label="Себестоимость" name="cost" type="number" inputProps={{ min: 0, step: 0.01 }} value={form.cost} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={4}>
-                  <TextField label="Старая цена" name="oldPrice" type="number" inputProps={{ min: 0, step: 0.01 }} value={form.oldPrice} onChange={handleChange} fullWidth />
+                  <TextField label="Старая цена" name="oldPrice" type="number" inputProps={{ min: 0, step: 0.01 }} value={form.oldPrice} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField label="Артикул (SKU)" name="sku" value={form.sku} onChange={handleChange} fullWidth />
+                  <TextField label="Артикул (SKU)" name="sku" value={form.sku} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField label="Штрихкод" name="barcode" value={form.barcode} onChange={handleChange} fullWidth />
+                  <TextField label="Штрихкод" name="barcode" value={form.barcode} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField select label="Единица измерения" name="unit" value={form.unit} onChange={handleChange} fullWidth>
+                  <TextField select label="Единица измерения" name="unit" value={form.unit} onChange={handleChange} fullWidth disabled={!editable}>
                     <MenuItem value="шт">шт</MenuItem>
                     <MenuItem value="кг">кг</MenuItem>
                     <MenuItem value="г">г</MenuItem>
@@ -325,7 +334,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
                   </TextField>
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField label="Порядок сортировки" name="sortOrder" type="number" value={form.sortOrder} onChange={handleChange} fullWidth />
+                  <TextField label="Порядок сортировки" name="sortOrder" type="number" value={form.sortOrder} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
               </Grid>
             </AccordionDetails>
@@ -340,22 +349,22 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
             <AccordionDetails>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
-                  <TextField label="Вес (г)" name="weight" type="number" inputProps={{ min: 0 }} value={form.weight} onChange={handleChange} fullWidth />
+                  <TextField label="Вес (г)" name="weight" type="number" inputProps={{ min: 0 }} value={form.weight} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField label="Объем (мл)" name="volume" type="number" inputProps={{ min: 0 }} value={form.volume} onChange={handleChange} fullWidth />
+                  <TextField label="Объем (мл)" name="volume" type="number" inputProps={{ min: 0 }} value={form.volume} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField label="Калории" name="calories" type="number" inputProps={{ min: 0 }} value={form.calories} onChange={handleChange} fullWidth />
+                  <TextField label="Калории" name="calories" type="number" inputProps={{ min: 0 }} value={form.calories} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField label="Белки (г)" name="proteins" type="number" inputProps={{ min: 0, step: 0.1 }} value={form.proteins} onChange={handleChange} fullWidth />
+                  <TextField label="Белки (г)" name="proteins" type="number" inputProps={{ min: 0, step: 0.1 }} value={form.proteins} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField label="Жиры (г)" name="fats" type="number" inputProps={{ min: 0, step: 0.1 }} value={form.fats} onChange={handleChange} fullWidth />
+                  <TextField label="Жиры (г)" name="fats" type="number" inputProps={{ min: 0, step: 0.1 }} value={form.fats} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField label="Углеводы (г)" name="carbs" type="number" inputProps={{ min: 0, step: 0.1 }} value={form.carbs} onChange={handleChange} fullWidth />
+                  <TextField label="Углеводы (г)" name="carbs" type="number" inputProps={{ min: 0, step: 0.1 }} value={form.carbs} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
               </Grid>
             </AccordionDetails>
@@ -370,19 +379,19 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
             <AccordionDetails>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <TextField label="Состав" name="composition" value={form.composition} onChange={handleChange} multiline minRows={2} fullWidth />
+                  <TextField label="Состав" name="composition" value={form.composition} onChange={handleChange} multiline minRows={2} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField label="Аллергены" name="allergens" value={form.allergens} onChange={handleChange} fullWidth />
+                  <TextField label="Аллергены" name="allergens" value={form.allergens} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField label="Срок годности (дни)" name="shelfLife" type="number" inputProps={{ min: 0 }} value={form.shelfLife} onChange={handleChange} fullWidth />
+                  <TextField label="Срок годности (дни)" name="shelfLife" type="number" inputProps={{ min: 0 }} value={form.shelfLife} onChange={handleChange} fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField label="Температура хранения" name="storageTemp" value={form.storageTemp} onChange={handleChange} placeholder="например: +2...+8°C" fullWidth />
+                  <TextField label="Температура хранения" name="storageTemp" value={form.storageTemp} onChange={handleChange} placeholder="например: +2...+8°C" fullWidth disabled={!editable} />
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField label="Теги (через запятую)" name="tags" value={form.tags} onChange={handleChange} fullWidth placeholder="кофе, горячий, популярный" />
+                  <TextField label="Теги (через запятую)" name="tags" value={form.tags} onChange={handleChange} fullWidth placeholder="кофе, горячий, популярный" disabled={!editable} />
                 </Grid>
               </Grid>
             </AccordionDetails>
@@ -397,13 +406,16 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
             <AccordionDetails>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <FormControlLabel control={<Switch checked={form.isActive} onChange={handleChange} name="isActive" />} label="Активен" />
+                  <FormControlLabel control={<Switch checked={form.isActive} onChange={handleChange} name="isActive" disabled={!editable} />} label="Активен" />
                 </Grid>
                 <Grid item xs={12}>
-                  <FormControlLabel control={<Switch checked={form.isPopular} onChange={handleChange} name="isPopular" />} label="Популярный" />
+                  <FormControlLabel control={<Switch checked={form.isIngredient} onChange={handleChange} name="isIngredient" disabled={!editable} />} label="Ингредиент (не готовый продукт)" />
                 </Grid>
                 <Grid item xs={12}>
-                  <FormControlLabel control={<Switch checked={form.isNew} onChange={handleChange} name="isNew" />} label="Новый товар" />
+                  <FormControlLabel control={<Switch checked={form.isPopular} onChange={handleChange} name="isPopular" disabled={!editable} />} label="Популярный" />
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControlLabel control={<Switch checked={form.isNew} onChange={handleChange} name="isNew" disabled={!editable} />} label="Новый товар" />
                 </Grid>
               </Grid>
             </AccordionDetails>
@@ -411,7 +423,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Отмена</Button>
-          <Button type="submit" variant="contained" disabled={loading}>
+          <Button type="submit" variant="contained" disabled={loading || !editable}>
             {isEdit ? 'Сохранить' : 'Создать'}
           </Button>
         </DialogActions>

@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import {useRouter} from 'next/navigation';
 import Layout from "@/components/Layout/Layout";
+import { usePermissions } from '@/components/hooks/usePermissions';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 
 interface User {
@@ -27,30 +28,13 @@ interface User {
 export default function UserEditPage({params}: { params: { id: string } }) {
     const {id} = params;
     const router = useRouter();
-    const token = sessionStorage.getItem("access_token");
-    const parseJwt = (token: string | null) => {
-        if (!token) {
-            console.error("Токен отсутствует");
-            return null;
-        }
-
-        try {
-            const [headerEncoded, payloadEncoded] = token.split('.').slice(0, 2);
-            const header = JSON.parse(atob(headerEncoded));
-            const payload = JSON.parse(atob(payloadEncoded));
-            return { header, payload };
-        } catch (error) {
-            console.error("Ошибка при парсинге токена:", error);
-            return null;
-        }
-    };
-    const parsedToken = parseJwt(token);
-    const role = parsedToken?.payload?.role;
+    const { role, userId, canEditUser, canDeleteUser } = usePermissions();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const token = sessionStorage.getItem('access_token');
 
     const fetchUser = async () => {
         try {
@@ -176,7 +160,7 @@ export default function UserEditPage({params}: { params: { id: string } }) {
                                 component="label"
                                 startIcon={<PhotoCamera/>}
                                 size="small"
-                                disabled={role==='READ'}
+                                disabled={!canEditUser(user.id)}
                             >
                                 Upload
                                 <input
@@ -193,7 +177,7 @@ export default function UserEditPage({params}: { params: { id: string } }) {
                                     color="error"
                                     size="small"
                                     onClick={handleAvatarRemove}
-                                    disabled={role==='READ'}
+                                    disabled={!canEditUser(user.id)}
                                 >
                                     Remove
                                 </Button>
@@ -207,17 +191,17 @@ export default function UserEditPage({params}: { params: { id: string } }) {
                         value={user.email}
                         onChange={(e) => setUser({...user, email: e.target.value})}
                         required
-                        disabled={role==='READ'}
+                        disabled={!canEditUser(user.id)}
                     />
                     <TextField
                         label="Full Name"
-                        disabled={role==='READ'}
+                        disabled={!canEditUser(user.id)}
                         value={user.fullName}
                         onChange={(e) => setUser({...user, fullName: e.target.value})}
                         required
                     />
                     <TextField
-                        disabled={role==='READ'}
+                        disabled={!canEditUser(user.id)}
                         label="Role"
                         select
                         value={user.role}
@@ -229,7 +213,7 @@ export default function UserEditPage({params}: { params: { id: string } }) {
                         <MenuItem value="READ">Читатель</MenuItem>
                     </TextField>
                     <TextField
-                        disabled={role==='READ'}
+                        disabled={!canEditUser(user.id)}
                         label="Phone"
                         value={user.phone}
                         onChange={(e) => setUser({...user, phone: e.target.value})}
@@ -237,13 +221,13 @@ export default function UserEditPage({params}: { params: { id: string } }) {
                     />
 
                     <Button type="submit" variant="contained" color="primary"
-                            disabled={role==='READ'}>
+                            disabled={!canEditUser(user.id)}>
                         Save
                     </Button>
                     <Button
                         variant="outlined"
                         color="error"
-                        disabled={!(role==='ADMIN')}
+                        disabled={!canDeleteUser(user.id)}
                         onClick={handleDelete}
                     >
                         Delete

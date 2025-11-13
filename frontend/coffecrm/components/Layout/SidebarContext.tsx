@@ -10,26 +10,30 @@ interface SidebarContextType {
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export const SidebarProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [collapsed, setCollapsedState] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  // Загрузить состояние из localStorage при монтировании
-  useEffect(() => {
-    const savedState = localStorage.getItem('sidebarCollapsed');
-    if (savedState !== null) {
-      setCollapsedState(JSON.parse(savedState));
+  // Инициализируем состояние синхронно, читая из localStorage (только на клиенте)
+  const getInitial = () => {
+    try {
+      const saved = localStorage.getItem('sidebarCollapsed');
+      return saved !== null ? JSON.parse(saved) as boolean : false;
+    } catch (e) {
+      return false;
     }
-    setMounted(true);
-  }, []);
-
-  const setCollapsed = (collapsed: boolean) => {
-    setCollapsedState(collapsed);
-    localStorage.setItem('sidebarCollapsed', JSON.stringify(collapsed));
   };
 
-  if (!mounted) {
-    return <>{children}</>;
-  }
+  const [collapsed, setCollapsedState] = useState<boolean>(() => {
+    // safe access: if localStorage unavailable, fallback to false
+    if (typeof window === 'undefined') return false;
+    return getInitial();
+  });
+
+  const setCollapsed = (value: boolean) => {
+    setCollapsedState(value);
+    try {
+      localStorage.setItem('sidebarCollapsed', JSON.stringify(value));
+    } catch (e) {
+      // ignore write errors
+    }
+  };
 
   return (
     <SidebarContext.Provider value={{ collapsed, setCollapsed }}>

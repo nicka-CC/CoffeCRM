@@ -25,6 +25,7 @@ import { useState } from 'react';
 import type { ProductListItem } from '@/types/products';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
 import { formatCurrency, formatNumber } from '@/utils/formatters';
+import { usePermissions } from '@/components/hooks/usePermissions';
 
 interface ProductTableProps {
   products: ProductListItem[];
@@ -34,6 +35,7 @@ interface ProductTableProps {
 
 const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onRefresh }) => {
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
+  const { canDeleteResource } = usePermissions();
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Удалить товар?')) return;
@@ -120,9 +122,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onRefresh
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Удалить">
-                      <IconButton color="error" onClick={() => handleDelete(product.id)}>
-                        <DeleteIcon />
-                      </IconButton>
+                      <span>
+                        <IconButton color="error" onClick={() => handleDelete(product.id)} disabled={!canDeleteResource('product')}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </span>
                     </Tooltip>
                     {product.stocks && product.stocks.length > 0 && (
                       <Tooltip title="Остатки по филиалам">

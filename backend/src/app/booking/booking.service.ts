@@ -128,47 +128,60 @@ export class BookingService {
       ];
     }
 
-    const bookings = await this.prisma.booking.findMany({
-      where,
-      include: {
-        branch: {
-          select: {
-            id: true,
-            name: true,
-            address: true,
-            city: true,
-            phone: true,
-          },
-        },
-        customer: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                fullName: true,
-                email: true,
-                phone: true,
-              },
-            },
-          },
-        },
-        employee: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                fullName: true,
-              },
-            },
-          },
-        },
-      },
-      orderBy: {
-        date: 'asc',
-      },
-    });
+    const page = query.page ? Number(query.page) : undefined;
+    const limit = query.limit ? Number(query.limit) : undefined;
+    const take = limit;
+    const skip = page && limit ? (page - 1) * limit : undefined;
 
-    return bookings;
+    const [bookings, total] = await this.prisma.$transaction([
+      this.prisma.booking.findMany({
+        where,
+        include: {
+          branch: {
+            select: {
+              id: true,
+              name: true,
+              address: true,
+              city: true,
+              phone: true,
+            },
+          },
+          customer: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  fullName: true,
+                  email: true,
+                  phone: true,
+                },
+              },
+            },
+          },
+          employee: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  fullName: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: { date: 'asc' },
+        take,
+        skip,
+      }),
+      this.prisma.booking.count({ where }),
+    ]);
+
+    return {
+      data: bookings,
+      total,
+      page: page ?? (skip !== undefined && take ? Math.floor(skip / take) + 1 : 1),
+      limit: take,
+    };
   }
 
   async findOne(id: string) {

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { OrderStatus } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma/prisma.service';
 import * as ExcelJS from 'exceljs';
-import PDFDocument from 'pdfkit';
+import * as PDFDocument from 'pdfkit';
 
 type AnalyticsPeriod = 'week' | 'month' | 'quarter' | 'custom';
 type ExportFormat = 'excel' | 'pdf';
@@ -358,7 +358,7 @@ export class AnalyticsService {
   }
 
   private async generatePdf(title: string, rows: Array<Record<string, unknown>>) {
-    const doc = new PDFDocument({ margin: 40 });
+    const doc = new (PDFDocument as any)({ margin: 40 });
     const buffers: Buffer[] = [];
 
     doc.on('data', (chunk) => buffers.push(chunk));

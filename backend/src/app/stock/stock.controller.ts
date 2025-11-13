@@ -18,8 +18,8 @@ export class StockController {
   }
 
   @Get('overview')
-  getOverview() {
-    return this.stockService.getInventoryOverview();
+  getOverview(@Query() query: any) {
+    return this.stockService.getInventoryOverview(query);
   }
 
   @Get('alerts/low')

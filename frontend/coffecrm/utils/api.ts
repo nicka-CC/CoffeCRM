@@ -17,10 +17,27 @@ export const withAuthHeaders = (headers: HeadersInit = {}) => {
   return headers;
 };
 
-export const buildUrl = (path: string) => {
+export const buildUrl = (path: string, params?: Record<string, any>) => {
+  let url = '';
   if (path.startsWith('http')) {
-    return path;
+    url = path;
+  } else {
+    url = `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
   }
-  return `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+
+  if (!params) return url;
+
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v === undefined || v === null || v === '') return;
+    if (Array.isArray(v)) {
+      v.forEach((it) => search.append(k, String(it)));
+    } else {
+      search.set(k, String(v));
+    }
+  });
+
+  const qs = search.toString();
+  return qs ? `${url}${url.includes('?') ? '&' : '?'}${qs}` : url;
 };
 

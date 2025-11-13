@@ -102,8 +102,16 @@ export class OrdersService {
       ];
     }
 
-    const take = query.take ? Number(query.take) : undefined;
-    const skip = query.skip ? Number(query.skip) : undefined;
+    // support page/limit or take/skip
+    const page = query.page ? Number(query.page) : undefined;
+    const limit = query.limit ? Number(query.limit) : undefined;
+    let take = query.take ? Number(query.take) : undefined;
+    let skip = query.skip ? Number(query.skip) : undefined;
+
+    if (page !== undefined && limit !== undefined) {
+      take = limit;
+      skip = (page - 1) * limit;
+    }
 
     const [orders, total] = await this.prisma.$transaction([
       this.prisma.order.findMany({
@@ -133,6 +141,8 @@ export class OrdersService {
     return {
       data: orders,
       total,
+      page: page ?? (skip !== undefined && take ? Math.floor(skip / take) + 1 : 1),
+      limit: take,
     };
   }
 

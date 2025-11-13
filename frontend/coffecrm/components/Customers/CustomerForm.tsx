@@ -18,6 +18,7 @@ import type { Customer, CreateCustomerDto, UpdateCustomerDto } from '@/types/cus
 import type { User } from '@/types/employees';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
 
+import { usePermissions } from '@/components/hooks/usePermissions';
 interface CustomerFormProps {
   open: boolean;
   onClose: () => void;
@@ -34,13 +35,16 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSuccess, c
     userId: '',
     bonus: '0',
     discountPercent: '0',
+
+
     vipStatus: false,
     notes: '',
     tags: '',
     source: '',
     birthday: '',
   });
-
+  const { canEditResource } = usePermissions();
+  const editable = canEditResource('customer', customer?.id);
   useEffect(() => {
     const fetchUsers = async () => {
       try {

@@ -14,6 +14,7 @@ import {
   Paper,
   Chip,
 } from '@mui/material';
+import TablePagination from '@mui/material/TablePagination';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -36,6 +37,9 @@ const OrdersPage: React.FC = () => {
     branchId: '',
     search: '',
   });
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [total, setTotal] = useState(0);
 
   const fetchOrders = async () => {
     try {
@@ -44,6 +48,8 @@ const OrdersPage: React.FC = () => {
       if (filters.status) params.status = filters.status;
       if (filters.branchId) params.branchId = filters.branchId;
       if (filters.search) params.search = filters.search;
+      params.page = String(page);
+      params.limit = String(rowsPerPage);
 
       const url = buildUrl('/orders', params);
       const response = await fetch(url, {
@@ -55,7 +61,8 @@ const OrdersPage: React.FC = () => {
       }
 
       const data = await response.json();
-      setOrders(Array.isArray(data) ? data : data?.data ?? []);
+      setOrders(data.data ?? (Array.isArray(data) ? data : []));
+      setTotal(data.total ?? 0);
       setError(null);
     } catch (err) {
       console.error(err);
@@ -68,6 +75,10 @@ const OrdersPage: React.FC = () => {
   useEffect(() => {
     fetchOrders();
   }, [filters]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [page, rowsPerPage]);
 
   const handleAddOrder = () => {
     setSelectedOrder(null);
@@ -216,6 +227,17 @@ const OrdersPage: React.FC = () => {
             ) : (
               <OrderTable orders={orders} onEdit={handleEditOrder} onView={handleViewOrder} />
             )}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+              <TablePagination
+                component="div"
+                count={total}
+                page={page - 1}
+                onPageChange={(_, newPage) => setPage(newPage + 1)}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(1); }}
+                rowsPerPageOptions={[10, 20, 50, 100]}
+              />
+            </Box>
           </>
         )}
 

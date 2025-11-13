@@ -84,50 +84,63 @@ export class StockService {
     return this.prisma.stock.delete({ where: { id } });
   }
 
-  async getInventoryOverview() {
-    const stocks = await this.prisma.stock.findMany({
-      include: {
-        branch: {
-          select: {
-            id: true,
-            name: true,
-            city: true,
-            region: true,
-            address: true,
-            phone: true,
-            email: true,
-            managerName: true,
-            managerPhone: true,
-          },
-        },
-        product: {
-          select: {
-            id: true,
-            name: true,
-            nameEn: true,
-            categoryId: true,
-            price: true,
-            cost: true,
-            sku: true,
-            barcode: true,
-            unit: true,
-            weight: true,
-            volume: true,
-            imageUrl: true,
-            icon: true,
-          },
-        },
-        transactions: {
-          take: 5,
-          orderBy: { date: 'desc' },
-        },
-      },
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    });
+  async getInventoryOverview(query?: any) {
+    const page = query?.page ? Number(query.page) : undefined;
+    const limit = query?.limit ? Number(query.limit) : undefined;
+    let take = limit;
+    let skip: number | undefined = undefined;
+    if (page !== undefined && limit !== undefined) {
+      skip = (page - 1) * limit;
+    }
 
-    return stocks.map((stock) => ({
+    const [stocks, total] = await this.prisma.$transaction([
+      this.prisma.stock.findMany({
+        include: {
+          branch: {
+            select: {
+              id: true,
+              name: true,
+              city: true,
+              region: true,
+              address: true,
+              phone: true,
+              email: true,
+              managerName: true,
+              managerPhone: true,
+            },
+          },
+          product: {
+            select: {
+              id: true,
+              name: true,
+              nameEn: true,
+              categoryId: true,
+              price: true,
+              cost: true,
+              sku: true,
+              barcode: true,
+              unit: true,
+              weight: true,
+              volume: true,
+              imageUrl: true,
+              icon: true,
+            },
+          },
+          transactions: {
+            take: 5,
+            orderBy: { date: 'desc' },
+          },
+        },
+        orderBy: {
+          updatedAt: 'desc',
+        },
+        skip,
+        take,
+      }),
+      this.prisma.stock.count(),
+    ]);
+
+    const mapped = stocks.map((stock) => ({
       id: stock.id,
       branch: {
         id: stock.branchId,
@@ -173,6 +186,13 @@ export class StockService {
       recentTransactions: stock.transactions,
       updatedAt: stock.updatedAt,
     }));
+
+    return {
+      data: mapped,
+      total,
+      page: page ?? (skip !== undefined && take ? Math.floor(skip / take) + 1 : 1),
+      limit: take,
+    };
   }
 
   async registerTransaction(dto: CreateStockTransactionDto) {

@@ -14,6 +14,7 @@ import {
   Tabs,
   Tab,
 } from '@mui/material';
+import TablePagination from '@mui/material/TablePagination';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Layout from '@/components/Layout/Layout';
@@ -31,6 +32,9 @@ const CustomersPage: React.FC = () => {
   const [vipFilter, setVipFilter] = useState<string>('');
   const [formOpen, setFormOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [total, setTotal] = useState(0);
 
   const fetchCustomers = async () => {
     try {
@@ -38,6 +42,9 @@ const CustomersPage: React.FC = () => {
       const params: Record<string, string> = {};
       if (search) params.search = search;
       if (vipFilter) params.vipStatus = vipFilter;
+
+      params.page = String(page);
+      params.limit = String(rowsPerPage);
 
       const url = buildUrl('/customers', params);
       const response = await fetch(url, {
@@ -49,7 +56,8 @@ const CustomersPage: React.FC = () => {
       }
 
       const data = await response.json();
-      setCustomers(Array.isArray(data.data) ? data.data : data.data?.data ?? []);
+      setCustomers(data.data ?? (Array.isArray(data) ? data : []));
+      setTotal(data.total ?? (Array.isArray(data) ? data.length : 0));
       setError(null);
     } catch (err) {
       console.error(err);
@@ -61,7 +69,7 @@ const CustomersPage: React.FC = () => {
 
   useEffect(() => {
     fetchCustomers();
-  }, [search, vipFilter]);
+  }, [search, vipFilter, page, rowsPerPage]);
 
   const handleView = (customer: Customer) => {
     // TODO: Открыть детали клиента
@@ -205,13 +213,26 @@ const CustomersPage: React.FC = () => {
                 </Typography>
               </Paper>
             ) : (
-              <CustomerTable
-                customers={customers}
-                onEdit={handleEdit}
-                onView={handleView}
-                onViewHistory={handleViewHistory}
-                onViewBonuses={handleViewBonuses}
-              />
+              <>
+                <CustomerTable
+                  customers={customers}
+                  onEdit={handleEdit}
+                  onView={handleView}
+                  onViewHistory={handleViewHistory}
+                  onViewBonuses={handleViewBonuses}
+                />
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                  <TablePagination
+                    component="div"
+                    count={total}
+                    page={page - 1}
+                    onPageChange={(_, newPage) => setPage(newPage + 1)}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(1); }}
+                    rowsPerPageOptions={[10, 20, 50, 100]}
+                  />
+                </Box>
+              </>
             )}
           </>
         )}

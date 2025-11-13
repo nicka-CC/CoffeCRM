@@ -13,6 +13,7 @@ import {
   Button,
 } from '@mui/material';
 import Link from 'next/link';
+import { usePermissions } from '@/components/hooks/usePermissions';
 
 interface User {
   id: string;
@@ -24,6 +25,7 @@ interface User {
 }
 
 export default function UsersPage() {
+  const { canEditUser } = usePermissions();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -82,11 +84,17 @@ export default function UsersPage() {
                   <TableCell>{user.phone}</TableCell>
                   <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
                   <TableCell>
-                    <Link href={`/users/${user.id}`}>
-                      <Button variant="contained" size="small">
-                        Edit
+                    {canEditUser(user.id) ? (
+                      <Link href={`/users/${user.id}`}>
+                        <Button variant="contained" size="small">
+                          Edit
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Button variant="outlined" size="small" disabled>
+                        View
                       </Button>
-                    </Link>
+                    )}
                   </TableCell>
                 </TableRow>
             ))}

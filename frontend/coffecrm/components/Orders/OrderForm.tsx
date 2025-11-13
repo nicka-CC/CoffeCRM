@@ -24,6 +24,7 @@ import type { BranchSummary } from '@/types/branches';
 import type { ProductListItem } from '@/types/products';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
 import { formatCurrency } from '@/utils/formatters';
+import { usePermissions } from '@/components/hooks/usePermissions';
 
 interface OrderFormProps {
   open: boolean;
@@ -51,6 +52,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
     status: 'NEW' as OrderStatus,
     items: [] as Array<{ productId: string; quantity: number; price: number; productName?: string }>,
   });
+  const { canEditResource } = usePermissions();
+  const editable = canEditResource('order', order?.id);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -203,6 +206,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
                 value={form.branchId}
                 onChange={(e) => setForm((prev) => ({ ...prev, branchId: e.target.value }))}
                 fullWidth
+                disabled={!editable}
               >
                 {branches.map((branch) => (
                   <MenuItem key={branch.id} value={branch.id}>
@@ -218,6 +222,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
                 value={form.customerId}
                 onChange={(e) => setForm((prev) => ({ ...prev, customerId: e.target.value }))}
                 fullWidth
+                disabled={!editable}
               />
             </Grid>
             {isEdit && (
@@ -269,6 +274,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
                             onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
                             fullWidth
                             size="small"
+                            disabled={!editable}
                           >
                             {products
                               .filter((p) => p.isActive)
@@ -289,6 +295,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
                             onChange={(e) => handleItemChange(index, 'quantity', Number(e.target.value))}
                             fullWidth
                             size="small"
+                            disabled={!editable}
                           />
                         </Grid>
                         <Grid item xs={4} md={2}>
@@ -301,6 +308,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
                             onChange={(e) => handleItemChange(index, 'price', Number(e.target.value))}
                             fullWidth
                             size="small"
+                            disabled={!editable}
                           />
                         </Grid>
                         <Grid item xs={3} md={2}>
@@ -309,7 +317,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
                           </Typography>
                         </Grid>
                         <Grid item xs={1} md={1}>
-                          <IconButton size="small" color="error" onClick={() => handleRemoveItem(index)}>
+                          <IconButton size="small" color="error" onClick={() => handleRemoveItem(index)} disabled={!editable}>
                             <DeleteIcon />
                           </IconButton>
                         </Grid>

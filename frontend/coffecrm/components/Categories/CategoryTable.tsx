@@ -18,6 +18,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import type { Category } from '@/types/categories';
+import { usePermissions } from '@/components/hooks/usePermissions';
 
 interface CategoryTableProps {
   categories: Category[];
@@ -26,6 +27,7 @@ interface CategoryTableProps {
 }
 
 const CategoryTable: React.FC<CategoryTableProps> = ({ categories, onEdit, onDelete }) => {
+  const { canDeleteResource } = usePermissions();
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
       <Table>
@@ -64,9 +66,11 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ categories, onEdit, onDel
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Удалить">
-                  <IconButton size="small" color="error" onClick={() => onDelete(category.id)}>
-                    <DeleteIcon />
-                  </IconButton>
+                  <span>
+                    <IconButton size="small" color="error" onClick={() => onDelete(category.id)} disabled={!canDeleteResource('category')}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </span>
                 </Tooltip>
               </TableCell>
             </TableRow>

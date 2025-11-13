@@ -21,6 +21,7 @@ import type { Booking, CreateBookingDto, UpdateBookingDto, BookingStatus, Bookin
 import type { BranchSummary } from '@/types/branches';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
 import { formatCurrency } from '@/utils/formatters';
+import { usePermissions } from '@/components/hooks/usePermissions';
 
 interface BookingFormProps {
   open: boolean;
@@ -94,6 +95,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ open, onClose, onSuccess, boo
     source: '',
     tags: '',
   });
+
+  const { canEditResource } = usePermissions();
+  const editable = canEditResource('booking', booking?.id);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -616,7 +620,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ open, onClose, onSuccess, boo
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Отмена</Button>
-          <Button type="submit" variant="contained" disabled={loading}>
+          <Button type="submit" variant="contained" disabled={loading || !editable}>
             {isEdit ? 'Сохранить' : 'Создать'}
           </Button>
         </DialogActions>

@@ -28,6 +28,12 @@ export class ProductService {
       where.isActive = query.isActive === 'true';
     }
 
+    if (query.isIngredient !== undefined) {
+      // accept both 'true'/'false' strings and boolean
+      const val = typeof query.isIngredient === 'string' ? query.isIngredient === 'true' : Boolean(query.isIngredient);
+      (where as any).isIngredient = val;
+    }
+
     if (query.search) {
       where.name = {
         contains: query.search,
@@ -35,20 +41,35 @@ export class ProductService {
       };
     }
 
-    return this.prisma.product.findMany({
-      where,
-      include: {
-        category: true,
-        stocks: {
-          include: {
-            branch: true,
+    // pagination
+    const page = parseInt(query.page, 10) || 1;
+    const limit = parseInt(query.limit, 10) || 20;
+    const skip = (page - 1) * limit;
+
+    const [total, items] = await Promise.all([
+      this.prisma.product.count({ where }),
+      this.prisma.product.findMany({
+        where,
+        include: {
+          category: true,
+          stocks: {
+            include: {
+              branch: true,
+            },
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+    ]);
+
+    return {
+      data: items,
+      total,
+      page,
+      limit,
+    };
   }
 
   async findOne(id: string) {

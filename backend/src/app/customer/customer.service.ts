@@ -42,8 +42,8 @@ export class CustomerService {
   }
 
   async findAll(query: any) {
-    const take = query.take ? Number(query.take) : undefined;
-    const skip = query.skip ? Number(query.skip) : undefined;
+    const take = query.limit ? Number(query.limit) : query.take ? Number(query.take) : undefined;
+    const skip = query.page && query.limit ? (Number(query.page) - 1) * Number(query.limit) : query.skip ? Number(query.skip) : undefined;
     const search = query.search as string | undefined;
     const vipStatus = query.vipStatus === 'true' ? true : query.vipStatus === 'false' ? false : undefined;
     const minSpent = query.minSpent ? Number(query.minSpent) : undefined;

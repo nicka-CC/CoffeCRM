@@ -162,6 +162,7 @@ model Product {
   storageTemp   String?  // температура хранения
   imageUrl      String?
   images        String[] // массив дополнительных изображений
+  isIngredient  Boolean  @default(false) // true если товар — ингредиент, иначе готовый продукт
   isActive      Boolean  @default(true)
   isPopular     Boolean  @default(false)
   isNew         Boolean  @default(false)

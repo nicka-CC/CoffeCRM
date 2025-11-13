@@ -30,6 +30,7 @@ export interface ProductListItem {
   images?: string[] | null;
   icon?: string | null;
   isActive: boolean;
+  isIngredient?: boolean;
   isPopular?: boolean;
   isNew?: boolean;
   sortOrder?: number;

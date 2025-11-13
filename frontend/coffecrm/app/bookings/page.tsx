@@ -16,6 +16,7 @@ import {
   Tabs,
   Tab,
 } from '@mui/material';
+import TablePagination from '@mui/material/TablePagination';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -33,6 +34,9 @@ const BookingsPage: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [total, setTotal] = useState(0);
   const [formOpen, setFormOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -57,6 +61,9 @@ const BookingsPage: React.FC = () => {
       if (filters.dateFrom) params.dateFrom = filters.dateFrom;
       if (filters.dateTo) params.dateTo = filters.dateTo;
 
+      params.page = String(page);
+      params.limit = String(rowsPerPage);
+
       const url = buildUrl('/bookings', params);
       const response = await fetch(url, {
         headers: withAuthHeaders(),
@@ -67,7 +74,8 @@ const BookingsPage: React.FC = () => {
       }
 
       const data = await response.json();
-      setBookings(Array.isArray(data) ? data : data?.data ?? []);
+      setBookings(data.data ?? (Array.isArray(data) ? data : []));
+      setTotal(data.total ?? (Array.isArray(data) ? data.length : 0));
       setError(null);
     } catch (err) {
       console.error(err);
@@ -79,7 +87,7 @@ const BookingsPage: React.FC = () => {
 
   useEffect(() => {
     fetchBookings();
-  }, [filters]);
+  }, [filters, page, rowsPerPage]);
 
   const handleAddBooking = () => {
     setSelectedBooking(null);
@@ -330,13 +338,26 @@ const BookingsPage: React.FC = () => {
                     </Typography>
                   </Paper>
                 ) : (
-                  <BookingTable
-                    bookings={bookings}
-                    onEdit={handleEditBooking}
-                    onView={handleViewBooking}
-                    onConfirm={handleConfirmBooking}
-                    onCancel={handleCancelBooking}
-                  />
+                  <>
+                    <BookingTable
+                      bookings={bookings}
+                      onEdit={handleEditBooking}
+                      onView={handleViewBooking}
+                      onConfirm={handleConfirmBooking}
+                      onCancel={handleCancelBooking}
+                    />
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                      <TablePagination
+                        component="div"
+                        count={total}
+                        page={page - 1}
+                        onPageChange={(_, newPage) => setPage(newPage + 1)}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(1); }}
+                        rowsPerPageOptions={[10, 20, 50, 100]}
+                      />
+                    </Box>
+                  </>
                 )}
               </>
             ) : (

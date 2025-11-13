@@ -79,6 +79,9 @@ export class CreateProductDto {
   @ApiPropertyOptional({ description: 'Порядок сортировки', type: Number, default: 0 })
   sortOrder?: number;
 
+  @ApiPropertyOptional({ description: 'Признак — товар является ингредиентом', default: false })
+  isIngredient?: boolean;
+
   @ApiPropertyOptional({ description: 'Теги', type: [String] })
   tags?: string[];
 
@@ -164,6 +167,9 @@ export class UpdateProductDto {
 
   @ApiPropertyOptional({ description: 'Порядок сортировки', type: Number })
   sortOrder?: number;
+
+  @ApiPropertyOptional({ description: 'Признак — товар является ингредиентом' })
+  isIngredient?: boolean;
 
   @ApiPropertyOptional({ description: 'Теги', type: [String] })
   tags?: string[];

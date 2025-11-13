@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Grid,
   Paper,
+  TablePagination,
   Table,
   TableBody,
   TableCell,
@@ -38,6 +39,9 @@ import { formatCurrency, formatDateTime, formatNumber } from '@/utils/formatters
 
 const InventoryPage: React.FC = () => {
   const [overview, setOverview] = useState<StockOverviewItem[]>([]);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [total, setTotal] = useState<number | null>(null);
   const [alerts, setAlerts] = useState<LowStockAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,8 +52,15 @@ const InventoryPage: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
+      const params: Record<string, string> = {};
+      if (page) params.page = String(page);
+      if (rowsPerPage) params.limit = String(rowsPerPage);
+
+      const overviewUrl = new URL(`${API_BASE_URL}/stocks/overview`);
+      Object.entries(params).forEach(([k, v]) => overviewUrl.searchParams.set(k, v));
+
       const [overviewRes, alertsRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/stocks/overview`, { headers: withAuthHeaders() }),
+        fetch(overviewUrl.toString(), { headers: withAuthHeaders() }),
         fetch(`${API_BASE_URL}/stocks/alerts/low`, { headers: withAuthHeaders() }),
       ]);
 
@@ -60,7 +71,17 @@ const InventoryPage: React.FC = () => {
       const overviewData = await overviewRes.json();
       const alertsData = await alertsRes.json();
 
-      setOverview(overviewData ?? []);
+      // backend may return paginated shape { data, total, page, limit }
+      if (overviewData && Array.isArray(overviewData.data)) {
+        setOverview(overviewData.data ?? []);
+        setTotal(typeof overviewData.total === 'number' ? overviewData.total : null);
+      } else if (Array.isArray(overviewData)) {
+        setOverview(overviewData ?? []);
+        setTotal(overviewData.length);
+      } else {
+        setOverview([]);
+        setTotal(0);
+      }
       setAlerts(alertsData ?? []);
       setError(null);
     } catch (err) {
@@ -73,7 +94,7 @@ const InventoryPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [page, rowsPerPage]);
 
   const totalValue = useMemo(() => overview.reduce((acc, item) => acc + (item.estimatedValue ?? 0), 0), [overview]);
   const totalQuantity = useMemo(() => overview.reduce((acc, item) => acc + (item.quantity ?? 0), 0), [overview]);
@@ -271,6 +292,17 @@ const InventoryPage: React.FC = () => {
                                         ))}
                                       </TableBody>
                                     </Table>
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                                      <TablePagination
+                                        component="div"
+                                        count={total ?? overview.length}
+                                        page={page - 1}
+                                        onPageChange={(_, newPage) => setPage(newPage + 1)}
+                                        rowsPerPage={rowsPerPage}
+                                        onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(1); }}
+                                        rowsPerPageOptions={[10, 20, 50, 100]}
+                                      />
+                                    </Box>
                                   </Box>
                                 </Collapse>
                               </TableCell>
