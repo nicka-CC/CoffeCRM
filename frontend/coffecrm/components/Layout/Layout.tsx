@@ -48,6 +48,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
   const [authorized, setAuthorized] = useState(false);
   const { userId } = usePermissions();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [name, setName] = useState<string | null>(null);
 
   useEffect(() => {
     const token = sessionStorage.getItem('access_token'); // или localStorage
@@ -74,6 +75,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
         if (data?.icon) {
           // backend returns path like /uploads/..., prepend host if needed
           setAvatarUrl(data.icon.startsWith('http') ? data.icon : `http://localhost:7000${data.icon}`);
+          setName(data.fullName);
         }
       } catch (err) {
         // ignore
@@ -135,7 +137,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
 
             {/* Right Side Actions */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-
+              <Typography color={'gray'}>{name}</Typography>
               <IconButton
                 size="large"
                 aria-label="account of current user"

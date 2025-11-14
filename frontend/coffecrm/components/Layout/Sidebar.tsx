@@ -115,8 +115,6 @@ const Sidebar: React.FC<SidebarProps> = ({open, onClose}) => {
             header: 'Пользователи и роли',
             items: [
                 {title: 'Users', icon: <People/>, path: '/users'},
-                {title: 'Roles', icon: <Security/>, path: '/roles'},
-                {title: 'Create Role', icon: <PersonAdd/>, path: '/roles/create'},
             ],
         },
         {
