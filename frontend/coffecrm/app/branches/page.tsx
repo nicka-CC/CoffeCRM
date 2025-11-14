@@ -101,7 +101,7 @@ const BranchesPage: React.FC = () => {
         {!loading && !error && (
           <Stack spacing={3}>
             <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }} color="textSecondary">
                 Карта сети
               </Typography>
               <BranchesMap branches={branches} />
@@ -109,7 +109,7 @@ const BranchesPage: React.FC = () => {
 
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                <Typography variant="h5" sx={{ fontWeight: 700 }} color="textSecondary">
                   Список филиалов
                 </Typography>
                 {perms.canEditResource('branch') && (

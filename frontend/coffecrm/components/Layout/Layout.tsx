@@ -21,7 +21,10 @@ import {
 import Link from 'next/link';
 import {usePathname, useRouter} from 'next/navigation';
 import Sidebar from './Sidebar';
+import { usePermissions } from '@/components/hooks/usePermissions';
 import { useSidebar } from './SidebarContext';
+import ico from "@/public/cup.svg"
+import Image from "next/image";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -43,6 +46,8 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
   };
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
+  const { userId } = usePermissions();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const token = sessionStorage.getItem('access_token'); // или localStorage
@@ -52,6 +57,30 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
       setAuthorized(true); // рендерим только если есть токен
     }
   }, [router]);
+
+  useEffect(() => {
+    // Fetch current user profile to get avatar/icon
+    const fetchProfile = async () => {
+      try {
+        const token = sessionStorage.getItem('access_token');
+        if (!token || !userId) return;
+        const res = await fetch(`http://localhost:7000/user/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.icon) {
+          // backend returns path like /uploads/..., prepend host if needed
+          setAvatarUrl(data.icon.startsWith('http') ? data.icon : `http://localhost:7000${data.icon}`);
+        }
+      } catch (err) {
+        // ignore
+      }
+    };
+    fetchProfile();
+  }, [userId]);
 
   if (!authorized) {
     return (<div style={{ display: 'flex', backgroundColor:'white', width:'100%',height:'100%' }}></div>); // пока редирект, ничего не рендерим (нет мигания)
@@ -64,239 +93,48 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
       {/* Main Content */}
       <Box component="main" sx={{ 
         flexGrow: 1, 
-        minHeight: '100%',
+        minHeight: '100vh',
         marginLeft: collapsed ? '72px' : '260px',
         transition: 'margin-left 0.3s ease',
+        display: 'flex',
+        flexDirection: 'column',
+        width: '0'
       }}>
         {/* Top App Bar */}
-        <AppBar position="static" sx={{ backgroundColor: 'white', color: 'black', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}>
-          <Toolbar>
+        <AppBar position="static" sx={{ backgroundColor: 'white', color: 'black', boxShadow: 'none', borderBottom: '1px solid #e0e0e0', minWidth: 0 }}>
+          <Toolbar sx={{ overflow: 'hidden', '& > *': { minWidth: 0 } }}>
             {/* Logo */}
             <Box sx={{ display: 'flex', alignItems: 'center', mr: 4 }}>
-              <Box sx={{
-                width: 32,
-                height: 32,
-                backgroundColor: '#6366f1',
-                borderRadius: '6px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mr: 1
-              }}>
-                <Typography sx={{ color: 'white', fontWeight: 'bold' }}>C</Typography>
-              </Box>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#6366f1' }}>
-                CoffeeCRM
-              </Typography>
+              {/*<Box sx={{*/}
+              {/*  width: 32,*/}
+              {/*  height: 32,*/}
+
+              {/*  borderRadius: '6px',*/}
+              {/*  display: 'flex',*/}
+              {/*  alignItems: 'center',*/}
+              {/*  justifyContent: 'center',*/}
+              {/*  mr: 1*/}
+              {/*}}>*/}
+              {/*  <Image*/}
+              {/*      src={ico}*/}
+              {/*      width={45}*/}
+              {/*      height={45}*/}
+              {/*      alt={'f'}*/}
+              {/*  >*/}
+              {/*  </Image>*/}
+              {/*</Box>*/}
+              {/*<Typography variant="h6" sx={{ fontWeight: 'bold', color: '#6366f1' }}>*/}
+              {/*  CoffeeCRM*/}
+              {/*</Typography>*/}
             </Box>
 
             {/* Navigation Menu */}
-            <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 3 }}>
-              <Link href="/" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname === '/' ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname === '/' ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Dashboard
-                </Typography>
-              </Link>
-              <Link href="/users" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname === '/users' ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname === '/users' ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Users
-                </Typography>
-              </Link>
-              <Link href="/roles" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname === '/roles' ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname === '/roles' ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Roles
-                </Typography>
-              </Link>
-              <Link href="/roles/create" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname === '/roles/create' ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname === '/roles/create' ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Create Role
-                </Typography>
-              </Link>
-              <Link href="/branches" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname?.startsWith('/branches') ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname?.startsWith('/branches') ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Branches
-                </Typography>
-              </Link>
-              <Link href="/products" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname === '/products' ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname === '/products' ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Products
-                </Typography>
-              </Link>
-              <Link href="/inventory" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname === '/inventory' ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname === '/inventory' ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Inventory
-                </Typography>
-              </Link>
-              <Link href="/orders" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname?.startsWith('/orders') ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname?.startsWith('/orders') ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Orders
-                </Typography>
-              </Link>
-              <Link href="/employees" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname?.startsWith('/employees') ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname?.startsWith('/employees') ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Employees
-                </Typography>
-              </Link>
-              <Link href="/categories" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname === '/categories' ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname === '/categories' ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Categories
-                </Typography>
-              </Link>
-              <Link href="/bookings" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname?.startsWith('/bookings') ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname?.startsWith('/bookings') ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Bookings
-                </Typography>
-              </Link>
-              <Link href="/customers" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname?.startsWith('/customers') ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname?.startsWith('/customers') ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Customers
-                </Typography>
-              </Link>
-              <Link href="/analytics" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname?.startsWith('/analytics') ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname?.startsWith('/analytics') ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Analytics
-                </Typography>
-              </Link>
-              <Link href="/settings" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: pathname?.startsWith('/settings') ? '#6366f1' : 'text.secondary',
-                    borderBottom: pathname?.startsWith('/settings') ? '2px solid #6366f1' : 'none',
-                    pb: 0.5,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Settings
-                </Typography>
-              </Link>
+            <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+
             </Box>
 
             {/* Right Side Actions */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Button
-                variant="outlined"
-                size="small"
-                sx={{
-                  textTransform: 'none',
-                  borderColor: '#e0e0e0',
-                  color: 'text.secondary',
-                  '&:hover': {
-                    borderColor: '#6366f1',
-                    color: '#6366f1'
-                  }
-                }}
-              >
-                Feedback
-              </Button>
-
-              <IconButton size="small">
-                <GridView />
-              </IconButton>
 
               <IconButton
                 size="large"
@@ -306,8 +144,11 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
                 onClick={handleMenu}
                 color="inherit"
               >
-                <Avatar sx={{ width: 32, height: 32, backgroundColor: '#6366f1' }}>
-                  <AccountCircle />
+                <Avatar
+                  src={avatarUrl || undefined}
+                  sx={{ width: 32, height: 32, backgroundColor: avatarUrl ? undefined : '#6366f1' }}
+                >
+                  {!avatarUrl && <AccountCircle />}
                 </Avatar>
               </IconButton>
 
@@ -326,23 +167,28 @@ const Layout: React.FC<LayoutProps> = ({ children, title, subtitle }) => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>My account</MenuItem>
-                <MenuItem onClick={handleClose}>Logout</MenuItem>
+                <MenuItem onClick={() => { handleClose(); if (userId) router.push(`/users/${userId}`); }}>My account</MenuItem>
+                <MenuItem onClick={() => {
+                  handleClose();
+                  // Clear auth tokens and redirect to login
+                  try { sessionStorage.removeItem('access_token'); sessionStorage.removeItem('refresh_token'); } catch(e){}
+                  try { localStorage.removeItem('access_token'); localStorage.removeItem('refresh_token'); } catch(e){}
+                  router.replace('/login');
+                }}>Logout</MenuItem>
               </Menu>
             </Box>
           </Toolbar>
         </AppBar>
         
         {/* Page Content */}
-        <Box sx={{  backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 64px)' }}>
+        <Box sx={{ backgroundColor: '#f8fafc', minHeight: 'calc(100vh - 64px)', p: 3, overflow: 'auto', flex: 1, minWidth: 0 }}>
           {title && (
             <Box sx={{ mb: 3 }}>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, wordBreak: 'break-word',  color: 'black' }}>
                 {title}
               </Typography>
               {subtitle && (
-                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                <Typography variant="body1" sx={{ color: 'text.secondary', wordBreak: 'break-word' }}>
                   {subtitle}
                 </Typography>
               )}

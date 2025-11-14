@@ -76,7 +76,7 @@ const ProductsPage: React.FC = () => {
     <Layout title="Товары и меню" subtitle="Управляйте ассортиментом, ценами и остатками по филиалам">
       <Box sx={{ p: 3 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700}} color="textSecondary">
             Список товаров
           </Typography>
           <Stack direction="row" spacing={2} alignItems="center">

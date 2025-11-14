@@ -199,7 +199,7 @@ const BookingsPage: React.FC = () => {
     <Layout title="Бронирования" subtitle="Управляйте бронированиями, отслеживайте календарь и статусы">
       <Box sx={{ p: 3 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700 }} color="textSecondary">
             Бронирования
           </Typography>
           <Stack direction="row" spacing={1}>

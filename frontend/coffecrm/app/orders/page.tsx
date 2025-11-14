@@ -123,7 +123,7 @@ const OrdersPage: React.FC = () => {
     <Layout title="Заказы" subtitle="Управляйте заказами, отслеживайте статусы и анализируйте продажи">
       <Box sx={{ p: 3 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700 }} color="textSecondary">
             Список заказов
           </Typography>
           <Stack direction="row" spacing={1}>

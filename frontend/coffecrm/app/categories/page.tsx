@@ -95,7 +95,7 @@ const CategoriesPage: React.FC = () => {
     <Layout title="Категории товаров" subtitle="Управляйте категориями товаров">
       <Box sx={{ p: 3 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700 }} color="textSecondary">
             Список категорий
           </Typography>
           <Stack direction="row" spacing={1}>

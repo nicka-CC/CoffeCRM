@@ -114,7 +114,7 @@ const CustomersPage: React.FC = () => {
     <Layout title="Клиенты" subtitle="Управление клиентами, история заказов и бонусы">
       <Box sx={{ p: 3 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700 }} color="textSecondary">
             Клиенты
           </Typography>
           <Stack direction="row" spacing={1}>

@@ -104,7 +104,7 @@ export default function Home() {
     <Layout title="Dashboard" subtitle="Главная панель управления">
       <Box sx={{ p: 3 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700 }} color="textSecondary">
             Статистика
           </Typography>
           <FormControl size="small" sx={{ minWidth: 150 }}>

@@ -157,7 +157,7 @@ const RolesList: React.FC = () => {
     <Box>
       {/* Header Actions */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+        <Typography variant="h5" sx={{ fontWeight: 'bold' }} color="textSecondary">
           Roles Management
         </Typography>
         <Button
