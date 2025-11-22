@@ -15,10 +15,29 @@ import {
   TextField,
   CircularProgress,
   Alert,
+  ListSubheader,
+  Tooltip,
+  IconButton,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import GridOnIcon from '@mui/icons-material/GridOn';
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip as RechartsTooltip, 
+  Legend, 
+  ResponsiveContainer, 
+  BarChart, 
+  Bar, 
+  PieChart, 
+  Pie, 
+  Cell 
+} from 'recharts';
 import Layout from '@/components/Layout/Layout';
 import { API_BASE_URL, buildUrl, withAuthHeaders } from '@/utils/api';
 import { formatCurrency } from '@/utils/formatters';
@@ -62,7 +81,7 @@ const AnalyticsPage: React.FC = () => {
     }
   };
 
-  const handleExport = async (dataset: string, format: string) => {
+  const handleExport = async (dataset: 'sales' | 'branches' | 'products' | 'customers', format: 'excel' | 'pdf') => {
     try {
       const params: Record<string, string> = { dataset, format, period };
       if (period === 'custom' && from) params.from = from;
@@ -81,7 +100,24 @@ const AnalyticsPage: React.FC = () => {
       const downloadUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = downloadUrl;
-      a.download = `report-${dataset}-${new Date().toISOString()}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+      
+      // Better filename with current date in readable format
+      const dateStr = new Date().toLocaleDateString('ru-RU', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).replace(/[\s:.,]/g, '-');
+      
+      const datasetNames = {
+        sales: 'продажи',
+        branches: 'филиалы',
+        products: 'товары',
+        customers: 'клиенты'
+      };
+      
+      a.download = `отчет-${datasetNames[dataset]}-${dateStr}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(downloadUrl);
@@ -121,24 +157,37 @@ const AnalyticsPage: React.FC = () => {
           <Typography variant="h5" sx={{ fontWeight: 700 }} color="textSecondary">
             Аналитика
           </Typography>
-          <Stack direction="row" spacing={1}>
+          <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
             <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchAnalytics}>
               Обновить
             </Button>
-            <Button
-              variant="contained"
-              startIcon={<DownloadIcon />}
-              onClick={() => handleExport('sales', 'excel')}
-            >
-              Экспорт Excel
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<DownloadIcon />}
-              onClick={() => handleExport('sales', 'pdf')}
-            >
-              Экспорт PDF
-            </Button>
+            
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <Select
+                value=""
+                displayEmpty
+                onChange={(e) => {
+                  const [dataset, format] = e.target.value.split('|');
+                  if (dataset && format) {
+                    handleExport(dataset as any, format as any);
+                  }
+                }}
+                sx={{ height: '40px' }}
+                renderValue={() => 'Экспорт отчета'}
+              >
+                <ListSubheader>Excel</ListSubheader>
+                <MenuItem value="sales|excel">Отчет по продажам (Excel)</MenuItem>
+                <MenuItem value="branches|excel">Отчет по филиалам (Excel)</MenuItem>
+                <MenuItem value="products|excel">ТОП товаров (Excel)</MenuItem>
+                <MenuItem value="customers|excel">ТОП клиентов (Excel)</MenuItem>
+                
+                <ListSubheader sx={{ mt: 1 }}>PDF</ListSubheader>
+                <MenuItem value="sales|pdf">Отчет по продажам (PDF)</MenuItem>
+                <MenuItem value="branches|pdf">Отчет по филиалам (PDF)</MenuItem>
+                <MenuItem value="products|pdf">ТОП товаров (PDF)</MenuItem>
+                <MenuItem value="customers|pdf">ТОП клиентов (PDF)</MenuItem>
+              </Select>
+            </FormControl>
           </Stack>
         </Stack>
 
@@ -177,59 +226,101 @@ const AnalyticsPage: React.FC = () => {
         </Paper>
 
         {/* Sales Dynamics */}
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-            Динамика продаж
-          </Typography>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={salesDynamics || []}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="revenue" stroke="#6366f1" name="Выручка" />
-              <Line type="monotone" dataKey="orders" stroke="#10b981" name="Заказы" />
-            </LineChart>
-          </ResponsiveContainer>
-        </Paper>
-
         <Grid container spacing={3}>
-          {/* Top Products */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3 }}>
+            <Paper sx={{ p: 3, height: '100%' }}>
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                ТОП товаров
+                Динамика продаж
               </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={topProducts || []}>
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart data={salesDynamics || []}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
+                  <XAxis dataKey="date" />
+                  <YAxis yAxisId="left" />
+                  <YAxis yAxisId="right" orientation="right" />
+                  <RechartsTooltip 
+                    formatter={(value, name) => {
+                      if (name === 'Выручка') {
+                        return [formatCurrency(Number(value)), name];
+                      }
+                      return [value, name];
+                    }}
+                  />
                   <Legend />
-                  <Bar dataKey="quantity" fill="#6366f1" name="Количество" />
-                  <Bar dataKey="revenue" fill="#10b981" name="Выручка" />
-                </BarChart>
+                  <Line 
+                    yAxisId="left"
+                    type="monotone" 
+                    dataKey="orders" 
+                    stroke="#6366f1" 
+                    name="Количество заказов" 
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                  <Line 
+                    yAxisId="right"
+                    type="monotone" 
+                    dataKey="revenue" 
+                    stroke="#10b981" 
+                    name="Выручка"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
               </ResponsiveContainer>
             </Paper>
+          </Grid>
           </Grid>
 
           {/* Top Customers */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                ТОП клиентов
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={topCustomers || []}>
+            <Paper sx={{ p: 3, height: '100%' }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  ТОП клиентов
+                </Typography>
+                <Tooltip title="Экспорт в Excel">
+                  <IconButton onClick={() => handleExport('customers', 'excel')} size="small">
+                    <GridOnIcon />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart 
+                  data={topCustomers?.map(c => ({
+                    ...c,
+                    revenue: Number(c.revenue),
+                    name: c.name || c.phone || `Клиент #${c.customerId?.slice(0, 6)}`
+                  })) || []}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
+                  <XAxis type="number" />
+                  <YAxis 
+                    type="category" 
+                    dataKey="name" 
+                    width={150}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <RechartsTooltip 
+                    formatter={(value, name) => {
+                      if (name === 'revenue') {
+                        return [formatCurrency(Number(value)), 'Выручка'];
+                      }
+                      return [value, 'Заказов'];
+                    }}
+                  />
                   <Legend />
-                  <Bar dataKey="orders" fill="#f59e0b" name="Заказов" />
-                  <Bar dataKey="revenue" fill="#ef4444" name="Выручка" />
+                  <Bar 
+                    dataKey="revenue" 
+                    fill="#10b981" 
+                    name="Выручка"
+                    radius={[0, 4, 4, 0]}
+                  >
+                    {(topCustomers || []).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </Paper>
@@ -237,27 +328,59 @@ const AnalyticsPage: React.FC = () => {
 
           {/* Branch Sales */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                Продажи по филиалам
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
+            <Paper sx={{ p: 3, height: '100%' }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  Продажи по филиалам
+                </Typography>
+                <Tooltip title="Экспорт в Excel">
+                  <IconButton onClick={() => handleExport('branches', 'excel')} size="small">
+                    <GridOnIcon />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+              <ResponsiveContainer width="100%" height={350}>
                 <PieChart>
                   <Pie
-                    data={branchSales || []}
-                    dataKey="revenue"
+                    data={branchSales?.map(b => ({
+                      ...b,
+                      value: Number(b.revenue)
+                    })) || []}
+                    dataKey="value"
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    outerRadius={100}
-                    label
+                    innerRadius={60}
+                    outerRadius={120}
+                    paddingAngle={2}
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                    labelLine={false}
                   >
                     {(branchSales || []).map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={COLORS[index % COLORS.length]} 
+                        stroke="#fff"
+                        strokeWidth={1}
+                      />
                     ))}
                   </Pie>
-                  <Tooltip />
-                  <Legend />
+                  <RechartsTooltip 
+                    formatter={(value: number) => [
+                      formatCurrency(Number(value)),
+                      'Выручка'
+                    ]}
+                  />
+                  <Legend 
+                    layout="vertical"
+                    verticalAlign="middle"
+                    align="right"
+                    formatter={(value, entry: any, index) => {
+                      const total = branchSales?.reduce((sum, b) => sum + Number(b.revenue), 0) || 1;
+                      const percent = ((entry.payload.value / total) * 100).toFixed(1);
+                      return `${value}: ${percent}%`;
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </Paper>
@@ -265,23 +388,55 @@ const AnalyticsPage: React.FC = () => {
 
           {/* Peak Hours */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 3 }}>
+            <Paper sx={{ p: 3, height: '100%' }}>
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                Пиковые часы
+                Пиковые часы заказов
               </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={peakHours || []}>
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart 
+                  data={Array.from({ length: 24 }, (_, hour) => {
+                    const hourData = peakHours?.find(h => h.hour === hour) || { hour, orders: 0 };
+                    return {
+                      ...hourData,
+                      hour: `${hour}:00`,
+                      hourNum: hour,
+                      isPeak: hour >= 10 && hour <= 14 || hour >= 18 && hour <= 21
+                    };
+                  })}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="hour" />
                   <YAxis />
-                  <Tooltip />
+                  <RechartsTooltip 
+                    formatter={(value) => [`${value} заказов Количество заказов`]}
+                  />
                   <Legend />
-                  <Bar dataKey="orders" fill="#8b5cf6" name="Заказов" />
+                  <Bar 
+                    dataKey="orders" 
+                    name="Количество заказов"
+                    radius={[4, 4, 0, 0]}
+                  >
+                    {Array.from({ length: 24 }).map((_, index) => {
+                      const isPeak = index >= 10 && index <= 14 || index >= 18 && index <= 21;
+                      return (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={isPeak ? '#8b5cf6' : '#c4b5fd'}
+                        />
+                      );
+                    })}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
+              <Box mt={2} textAlign="center">
+                <Typography variant="caption" color="text.secondary">
+                  Пиковые часы отмечены более насыщенным цветом
+                </Typography>
+              </Box>
             </Paper>
           </Grid>
-        </Grid>
+        {/*</Grid>*/}
       </Box>
     </Layout>
   );
