@@ -67,7 +67,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
     isActive: true,
     isPopular: false,
     isNew: false,
-    sortOrder: '0',
+    sortOrder: 0,
     tags: '',
     isIngredient: false,
   });
@@ -118,7 +118,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
         isIngredient: product.isIngredient ?? false,
         isPopular: product.isPopular ?? false,
         isNew: product.isNew ?? false,
-        sortOrder: product.sortOrder?.toString() ?? '0',
+        sortOrder: product.sortOrder ?? 0,
         tags: product.tags?.join(', ') ?? '',
       });
       setPreview(product.imageUrl ? `${product.imageUrl.startsWith('http') ? product.imageUrl : `${API_BASE_URL}${product.imageUrl}`}` : null);
@@ -147,7 +147,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
         isActive: true,
         isPopular: false,
         isNew: false,
-        sortOrder: '0',
+        sortOrder: 0,
         tags: '',
         isIngredient: false,
       });
@@ -171,7 +171,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
     const { name, value, type, checked } = event.target;
     setForm((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: name === 'sortOrder' ? (value === '' ? 0 : Number(value)) : (type === 'checkbox' ? checked : value),
     }));
   };
 
@@ -204,7 +204,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSuccess, pro
       formData.append('isActive', String(form.isActive));
       formData.append('isPopular', String(form.isPopular));
       formData.append('isNew', String(form.isNew));
-      formData.append('sortOrder', form.sortOrder);
+      formData.append('sortOrder', String(form.sortOrder));
       if (form.tags) {
         const tagsArray = form.tags.split(',').map((tag) => tag.trim()).filter(Boolean);
         tagsArray.forEach((tag) => {

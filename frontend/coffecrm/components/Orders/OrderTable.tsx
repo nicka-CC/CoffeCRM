@@ -51,6 +51,8 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onEdit, onView }) => {
             <TableCell>Филиал</TableCell>
             <TableCell>Клиент</TableCell>
             <TableCell>Статус</TableCell>
+            <TableCell>Тип</TableCell>
+            <TableCell align="right">Движ.</TableCell>
             <TableCell align="right">Сумма</TableCell>
             <TableCell align="right">Товаров</TableCell>
             <TableCell align="right">Действия</TableCell>
@@ -81,6 +83,8 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onEdit, onView }) => {
                   size="small"
                 />
               </TableCell>
+              <TableCell>{order.type ?? '—'}</TableCell>
+              <TableCell align="right">{order.stockTransactions ? order.stockTransactions.length : 0}</TableCell>
               <TableCell align="right">{formatCurrency(order.total)}</TableCell>
               <TableCell align="right">{order.items?.length ?? 0}</TableCell>
               <TableCell align="right">

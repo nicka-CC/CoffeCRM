@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, TransactionType } from '@prisma/client';
 
 class OrderItemInputDto {
   @ApiProperty({ description: 'Идентификатор товара' })
@@ -21,6 +21,9 @@ export class CreateOrderDto {
 
   @ApiPropertyOptional({ description: 'Статус заказа', enum: OrderStatus, enumName: 'OrderStatus' })
   status?: OrderStatus;
+
+  @ApiPropertyOptional({ description: 'Тип операции по складу (INCOME = приход, EXPENSE = расход)', enum: TransactionType, enumName: 'TransactionType' })
+  type?: TransactionType;
 
   @ApiProperty({ description: 'Итоговая сумма заказа', type: Number })
   total: number;
@@ -46,6 +49,9 @@ export class CreateOrderDto {
 export class UpdateOrderDto {
   @ApiPropertyOptional({ description: 'Статус заказа', enum: OrderStatus, enumName: 'OrderStatus' })
   status?: OrderStatus;
+
+  @ApiPropertyOptional({ description: 'Тип операции по складу (INCOME = приход, EXPENSE = расход)', enum: TransactionType, enumName: 'TransactionType' })
+  type?: TransactionType;
 
   @ApiPropertyOptional({ description: 'Итоговая сумма заказа', type: Number })
   total?: number;

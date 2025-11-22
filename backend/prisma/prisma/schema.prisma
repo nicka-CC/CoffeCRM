@@ -225,16 +225,21 @@ model StockTransaction {
   expiryDate  DateTime? // срок годности для этой партии
   employeeId  String? // кто провел операцию
   notes       String? // примечания
+  orderId     String?
+
+  order       Order?   @relation(fields: [orderId], references: [id])
 
   stock     Stock    @relation(fields: [stockId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+// link from Order to its stock transactions
 model Order {
   id         String      @id @default(uuid())
   branchId   String
   customerId String?
+  type       TransactionType @default(EXPENSE)
   status     OrderStatus @default(NEW)
   total      Float
   createdAt  DateTime    @default(now())
@@ -242,6 +247,7 @@ model Order {
   branch    Branch      @relation(fields: [branchId], references: [id])
   customer  Customer?   @relation(fields: [customerId], references: [id])
   items     OrderItem[]
+  stockTransactions StockTransaction[]
   updatedAt DateTime    @updatedAt
 }
 

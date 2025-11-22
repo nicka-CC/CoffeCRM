@@ -14,20 +14,25 @@ export class OrdersService {
     );
 
     return this.prisma.$transaction(async (tx) => {
-      const order = await tx.order.create({
-        data: {
-          branchId: dto.branchId,
-          customerId: dto.customerId,
-          status: dto.status ?? OrderStatus.NEW,
-          total: dto.total ?? totalFromItems,
-          items: {
-            create: dto.items.map((item) => ({
-              productId: item.productId,
-              quantity: item.quantity,
-              price: item.price,
-            })),
-          },
+      const orderType = dto.type ?? TransactionType.EXPENSE;
+
+      const createData: any = {
+        branchId: dto.branchId,
+        customerId: dto.customerId,
+        type: orderType,
+        status: dto.status ?? OrderStatus.NEW,
+        total: dto.total ?? totalFromItems,
+        items: {
+          create: dto.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price,
+          })),
         },
+      };
+
+      const order = await tx.order.create({
+        data: createData as any,
         include: {
           items: {
             include: {
@@ -43,10 +48,18 @@ export class OrdersService {
         },
       });
 
+      // adjust stock according to order type: INCOME increases stock, EXPENSE decreases
       await Promise.all(
-        dto.items.map((item) =>
-          this.adjustStock(tx, dto.branchId, item.productId, -item.quantity, TransactionType.EXPENSE),
-        ),
+        dto.items.map((item) => {
+          const quantityDelta = orderType === TransactionType.INCOME ? item.quantity : -item.quantity;
+          return this.adjustStock(tx, dto.branchId, item.productId, quantityDelta, orderType, {
+            createTransaction: true,
+            orderId: order.id,
+            price: item.price,
+            totalPrice: item.price * item.quantity,
+            reason: `Order ${order.id}`,
+          });
+        }),
       );
 
       return order;
@@ -116,7 +129,7 @@ export class OrdersService {
     const [orders, total] = await this.prisma.$transaction([
       this.prisma.order.findMany({
         where,
-        include: {
+        include: ({
           branch: true,
           customer: {
             include: {
@@ -128,7 +141,8 @@ export class OrdersService {
               product: true,
             },
           },
-        },
+          stockTransactions: true,
+        } as any),
         orderBy: {
           createdAt: 'desc',
         },
@@ -149,7 +163,7 @@ export class OrdersService {
   async findOne(id: string) {
     const order = await this.prisma.order.findUnique({
       where: { id },
-      include: {
+      include: ({
         branch: true,
         customer: {
           include: {
@@ -161,7 +175,8 @@ export class OrdersService {
             product: true,
           },
         },
-      },
+        stockTransactions: true,
+      } as any),
     });
 
     if (!order) {
@@ -185,12 +200,19 @@ export class OrdersService {
       }
 
       if (dto.items) {
+        // remove previous stock transactions linked to this order (we will recreate them to mirror the order)
+        await tx.stockTransaction.deleteMany({ where: { orderId: id } } as any);
+
+        // revert previous stock deltas without creating transactions
+        const prevType = (existingOrder as any).type ?? TransactionType.EXPENSE;
         await Promise.all(
-          existingOrder.items.map((item) =>
-            this.adjustStock(tx, existingOrder.branchId, item.productId, item.quantity, TransactionType.INCOME),
-          ),
+          existingOrder.items.map((item) => {
+            const revertDelta = prevType === TransactionType.INCOME ? -item.quantity : item.quantity;
+            return this.adjustStock(tx, existingOrder.branchId, item.productId, revertDelta, prevType, { createTransaction: false });
+          }),
         );
 
+        // replace order items
         await tx.orderItem.deleteMany({ where: { orderId: id } });
         await tx.orderItem.createMany({
           data: dto.items.map((item) => ({
@@ -201,25 +223,34 @@ export class OrdersService {
           })),
         });
 
-        const newTotal = dto.items.reduce(
-          (acc, item) => acc + item.price * item.quantity,
-          0,
-        );
+        const newTotal = dto.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
         dto.total = dto.total ?? newTotal;
 
+        // apply new items and create new stock transactions linked to this order
+        const newType = dto.type ?? prevType ?? TransactionType.EXPENSE;
         await Promise.all(
-          dto.items.map((item) =>
-            this.adjustStock(tx, existingOrder.branchId, item.productId, -item.quantity, TransactionType.EXPENSE),
-          ),
+          dto.items.map((item) => {
+            const delta = newType === TransactionType.INCOME ? item.quantity : -item.quantity;
+            return this.adjustStock(tx, existingOrder.branchId, item.productId, delta, newType, {
+              createTransaction: true,
+              orderId: id,
+              price: item.price,
+              totalPrice: item.price * item.quantity,
+              reason: `Order ${id}`,
+            });
+          }),
         );
       }
 
+      const updateData: any = {
+        status: dto.status ?? existingOrder.status,
+        total: dto.total ?? existingOrder.total,
+        type: dto.type ?? (existingOrder as any).type ?? TransactionType.EXPENSE,
+      };
+
       const updatedOrder = await tx.order.update({
         where: { id },
-        data: {
-          status: dto.status ?? existingOrder.status,
-          total: dto.total ?? existingOrder.total,
-        },
+        data: updateData as any,
         include: {
           branch: true,
           customer: {
@@ -252,14 +283,19 @@ export class OrdersService {
         throw new NotFoundException(`Заказ с идентификатором ${id} не найден`);
       }
 
-      await tx.orderItem.deleteMany({ where: { orderId: id } });
+      // remove stock transactions linked to this order
+      await tx.stockTransaction.deleteMany({ where: { orderId: id } } as any);
 
+      // revert stock according to existing order type without creating transactions
+      const prevType = (existingOrder as any).type ?? TransactionType.EXPENSE;
       await Promise.all(
-        existingOrder.items.map((item) =>
-          this.adjustStock(tx, existingOrder.branchId, item.productId, item.quantity, TransactionType.INCOME),
-        ),
+        existingOrder.items.map((item) => {
+          const delta = prevType === TransactionType.INCOME ? -item.quantity : item.quantity;
+          return this.adjustStock(tx, existingOrder.branchId, item.productId, delta, prevType, { createTransaction: false });
+        }),
       );
 
+      await tx.orderItem.deleteMany({ where: { orderId: id } });
       await tx.order.delete({ where: { id } });
 
       return { success: true };
@@ -272,6 +308,19 @@ export class OrdersService {
     productId: string,
     quantityDelta: number,
     type: TransactionType,
+    options?: {
+      createTransaction?: boolean;
+      orderId?: string;
+      price?: number;
+      totalPrice?: number;
+      reason?: string;
+      document?: string;
+      supplier?: string;
+      batchNumber?: string;
+      expiryDate?: Date;
+      employeeId?: string;
+      notes?: string;
+    },
   ) {
     let stock = await tx.stock.findFirst({
       where: {
@@ -299,14 +348,26 @@ export class OrdersService {
       });
     }
 
-    await tx.stockTransaction.create({
-      data: {
-        stockId: stock.id,
-        type,
-        quantity: Math.abs(quantityDelta),
-        date: new Date(),
-      },
-    });
+    if (options?.createTransaction !== false) {
+      await tx.stockTransaction.create({
+        data: ({
+          stockId: stock.id,
+          type,
+          quantity: Math.abs(quantityDelta),
+          date: new Date(),
+          orderId: options?.orderId,
+          price: options?.price,
+          totalPrice: options?.totalPrice,
+          reason: options?.reason,
+          document: options?.document,
+          supplier: options?.supplier,
+          batchNumber: options?.batchNumber,
+          expiryDate: options?.expiryDate,
+          employeeId: options?.employeeId,
+          notes: options?.notes,
+        } as any),
+      });
+    }
 
     return stock;
   }

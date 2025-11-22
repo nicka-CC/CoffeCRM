@@ -49,6 +49,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
   const [form, setForm] = useState({
     branchId: '',
     customerId: '',
+    type: 'EXPENSE' as 'INCOME' | 'EXPENSE' | 'WRITE_OFF',
     status: 'NEW' as OrderStatus,
     items: [] as Array<{ productId: string; quantity: number; price: number; productName?: string }>,
   });
@@ -70,7 +71,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
 
         if (productsRes.ok) {
           const productsData = await productsRes.json();
-          setProducts(Array.isArray(productsData) ? productsData : []);
+          const productsList = Array.isArray(productsData) ? productsData : productsData?.data ?? [];
+          setProducts(productsList);
         }
       } catch (err) {
         console.error('Ошибка загрузки данных', err);
@@ -87,6 +89,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
       setForm({
         branchId: order.branchId,
         customerId: order.customerId ?? '',
+        type: (order as any).type ?? 'EXPENSE',
         status: order.status,
         items: order.items.map((item) => ({
           productId: item.productId,
@@ -99,6 +102,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
       setForm({
         branchId: '',
         customerId: '',
+        type: 'EXPENSE',
         status: 'NEW',
         items: [],
       });
@@ -147,6 +151,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
 
       const payload = isEdit
         ? ({
+            type: form.type,
             status: form.status,
             total: calculateTotal(),
             items: form.items.map((item) => ({
@@ -158,6 +163,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
         : ({
             branchId: form.branchId,
             customerId: form.customerId || undefined,
+            type: form.type,
             status: form.status,
             total: calculateTotal(),
             items: form.items.map((item) => ({
@@ -225,6 +231,22 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
                 disabled={!editable}
               />
             </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                select
+                label="Тип (приход/расход)"
+                name="type"
+                value={form.type}
+                onChange={(e) => setForm((prev) => ({ ...prev, type: e.target.value as any }))}
+                fullWidth
+              >
+                <MenuItem value="EXPENSE">Расход (продажа)</MenuItem>
+                <MenuItem value="INCOME">Приход (возврат/поступление)</MenuItem>
+                <MenuItem value="WRITE_OFF">Списание</MenuItem>
+              </TextField>
+            </Grid>
+
             {isEdit && (
               <Grid item xs={12} md={6}>
                 <TextField

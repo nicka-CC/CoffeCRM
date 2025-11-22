@@ -137,7 +137,7 @@ export class ProductService {
       unit: dto.unit ?? 'шт',
       isPopular: this.parseBoolean(dto.isPopular, false) ?? false,
       isNew: this.parseBoolean(dto.isNew, false) ?? false,
-      sortOrder: dto.sortOrder ?? 0,
+      sortOrder: this.parseNumber(dto.sortOrder) ?? 0,
     };
 
     if (dto.nameEn) {
@@ -325,7 +325,9 @@ export class ProductService {
     }
 
     if (dto.sortOrder !== undefined) {
-      data.sortOrder = dto.sortOrder;
+      const parsed = this.parseNumber((dto as any).sortOrder);
+      const value = parsed ?? undefined; // avoid null
+      data.sortOrder = value ?? 0;
     }
 
     if (dto.tags !== undefined && Array.isArray(dto.tags)) {

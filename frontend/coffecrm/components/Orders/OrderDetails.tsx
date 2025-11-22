@@ -73,6 +73,11 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ open, onClose, order }) => 
                     <strong>Филиал:</strong> {order.branch.name} ({order.branch.city})
                   </Typography>
                 )}
+                {order.type && (
+                  <Typography variant="body2">
+                    <strong>Тип:</strong> {order.type}
+                  </Typography>
+                )}
                 {order.customer?.user && (
                   <>
                     <Typography variant="body2">
@@ -156,6 +161,42 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ open, onClose, order }) => 
               </Table>
             </Paper>
           </Grid>
+
+          {order.stockTransactions && order.stockTransactions.length > 0 && (
+            <Grid item xs={12}>
+              <Paper sx={{ p: 2, border: '1px solid #e2e8f0' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
+                  Движения по складу (дублируют заказ)
+                </Typography>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Тип</TableCell>
+                      <TableCell>Количество</TableCell>
+                      <TableCell>Цена</TableCell>
+                      <TableCell>Сумма</TableCell>
+                      <TableCell>Дата</TableCell>
+                      <TableCell>Причина</TableCell>
+                      <TableCell>Примечание</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {order.stockTransactions.map((tx) => (
+                      <TableRow key={tx.id}>
+                        <TableCell>{tx.type}</TableCell>
+                        <TableCell>{tx.quantity}</TableCell>
+                        <TableCell>{tx.price ? formatCurrency(tx.price) : '—'}</TableCell>
+                        <TableCell>{tx.totalPrice ? formatCurrency(tx.totalPrice) : '—'}</TableCell>
+                        <TableCell>{formatDateTime(tx.date)}</TableCell>
+                        <TableCell>{tx.reason ?? '—'}</TableCell>
+                        <TableCell>{tx.notes ?? '—'}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </Grid>
+          )}
         </Grid>
       </DialogContent>
       <DialogActions>
