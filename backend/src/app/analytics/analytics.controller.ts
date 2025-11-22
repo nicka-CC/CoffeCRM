@@ -58,7 +58,6 @@ export class AnalyticsController {
           title = 'ТОП клиентов';
           break;
       }
-
       const result = format === 'excel'
           ? await this.analyticsService.generateExcel(title, data)
           : await this.analyticsService.generatePdf(title, data);
