@@ -17,6 +17,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import type { Order, OrderStatus } from '@/types/orders';
 import { formatCurrency, formatDateTime } from '@/utils/formatters';
+import {usePermissions} from "@/components/hooks/usePermissions";
 
 interface OrderTableProps {
   orders: Order[];
@@ -41,6 +42,7 @@ const statusLabels: Record<OrderStatus, string> = {
 };
 
 const OrderTable: React.FC<OrderTableProps> = ({ orders, onEdit, onView }) => {
+  const { canEditResource } = usePermissions();
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
       <Table>
@@ -89,12 +91,12 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onEdit, onView }) => {
               <TableCell align="right">{order.items?.length ?? 0}</TableCell>
               <TableCell align="right">
                 <Tooltip title="Просмотр">
-                  <IconButton size="small" onClick={() => onView(order)}>
+                  <IconButton disabled={!canEditResource('products', '1')} size="small" onClick={() => onView(order)}>
                     <VisibilityIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Редактировать">
-                  <IconButton size="small" onClick={() => onEdit(order)}>
+                  <IconButton disabled={!canEditResource('products', '1')} size="small" onClick={() => onEdit(order)}>
                     <EditIcon />
                   </IconButton>
                 </Tooltip>

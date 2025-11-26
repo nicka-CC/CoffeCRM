@@ -18,6 +18,7 @@ import CategoryTable from '@/components/Categories/CategoryTable';
 import CategoryForm from '@/components/Categories/CategoryForm';
 import type { Category } from '@/types/categories';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
+import {usePermissions} from "@/components/hooks/usePermissions";
 
 const CategoriesPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -25,6 +26,7 @@ const CategoriesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const { canEditResource } = usePermissions();
 
   const fetchCategories = async () => {
     try {
@@ -102,7 +104,7 @@ const CategoriesPage: React.FC = () => {
             <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchCategories}>
               Обновить
             </Button>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddCategory}>
+            <Button variant="contained" disabled={!canEditResource('category', '1')} startIcon={<AddIcon />} onClick={handleAddCategory}>
               Добавить категорию
             </Button>
           </Stack>

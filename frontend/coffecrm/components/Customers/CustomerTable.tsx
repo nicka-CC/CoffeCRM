@@ -22,6 +22,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import type { Customer } from '@/types/customers';
 import { formatCurrency } from '@/utils/formatters';
+import {usePermissions} from "@/components/hooks/usePermissions";
 
 interface CustomerTableProps {
   customers: Customer[];
@@ -38,6 +39,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
   onViewHistory,
   onViewBonuses,
 }) => {
+  const { canEditResource } = usePermissions();
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
       <Table>
@@ -94,22 +96,22 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
               </TableCell>
               <TableCell align="right">
                 <Tooltip title="Просмотр">
-                  <IconButton size="small" onClick={() => onView(customer)}>
+                  <IconButton size="small" disabled={!canEditResource('products', '1')} onClick={() => onView(customer)}>
                     <VisibilityIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="История заказов">
-                  <IconButton size="small" onClick={() => onViewHistory(customer)}>
+                  <IconButton size="small" disabled={!canEditResource('products', '1')} onClick={() => onViewHistory(customer)}>
                     <HistoryIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Бонусы">
-                  <IconButton size="small" onClick={() => onViewBonuses(customer)}>
+                  <IconButton size="small" disabled={!canEditResource('products', '1')} onClick={() => onViewBonuses(customer)}>
                     <CardGiftcardIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Редактировать">
-                  <IconButton size="small" onClick={() => onEdit(customer)}>
+                  <IconButton size="small" disabled={!canEditResource('products', '1')} onClick={() => onEdit(customer)}>
                     <EditIcon />
                   </IconButton>
                 </Tooltip>

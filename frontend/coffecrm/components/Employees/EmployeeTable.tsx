@@ -103,7 +103,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, onEdit, onDele
                 </Tooltip>
                 <Tooltip title="Удалить">
                   <span>
-                  <IconButton size="small" color="error" onClick={() => onDelete(employee.id)} disabled={!canDeleteResource('employee')}>
+                  <IconButton disabled={!canEditResource('products', '1')} size="small" color="error" onClick={() => onDelete(employee.id)} >
                     <DeleteIcon />
                   </IconButton>
                   </span>

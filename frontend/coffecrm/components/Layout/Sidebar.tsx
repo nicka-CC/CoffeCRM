@@ -54,6 +54,7 @@ import {usePathname} from 'next/navigation';
 import {useSidebar} from './SidebarContext';
 import Image from "next/image";
 import ico from "@/public/cup.svg";
+import {usePermissions} from "@/components/hooks/usePermissions";
 
 interface SidebarProps {
     open: boolean;
@@ -65,6 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({open, onClose}) => {
     const {collapsed, setCollapsed} = useSidebar();
     const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({});
     // Для каскадных popover
+    const { canEditResource } = usePermissions();
     const [popoverStack, setPopoverStack] = useState<Array<{
         anchor: HTMLElement;
         items: any[];
@@ -166,12 +168,12 @@ const Sidebar: React.FC<SidebarProps> = ({open, onClose}) => {
                 {title: 'Analytics', icon: <TrendingUp/>, path: '/analytics'},
             ],
         },
-        {
+        ...(canEditResource('products', '1') ? [{
             header: 'Настройки',
             items: [
-                {title: 'Settings', icon: <Settings/>, path: '/settings'},
+                { title: 'Settings', icon: <Settings />, path: '/settings' },
             ],
-        },
+        }] : []),
     ];
 
     // Render a section header
@@ -320,6 +322,8 @@ const Sidebar: React.FC<SidebarProps> = ({open, onClose}) => {
         );
     };
 
+    // @ts-ignore
+    // @ts-ignore
     return (
         <>
             <Drawer
@@ -379,11 +383,11 @@ const Sidebar: React.FC<SidebarProps> = ({open, onClose}) => {
                 </Box>
                 <Divider/>
                 <Box sx={{pt: 1, pb: 1, overflowY: 'auto', overflowX: 'hidden', height: 'calc(100vh - 80px)'}}>
-                    {sidebarSections.map(section => (
+                    {sidebarSections.map((section :any):any => (
                         <React.Fragment key={section.header}>
                             {!collapsed && renderSectionHeader(section.header)}
                             <List sx={{mb: 1, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                                {section.items.map(item => renderSidebarItem(item))}
+                                {section.items.map((item :any) => renderSidebarItem(item))}
                             </List>
                         </React.Fragment>
                     ))}

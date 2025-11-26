@@ -24,6 +24,7 @@ import OrderForm from '@/components/Orders/OrderForm';
 import OrderDetails from '@/components/Orders/OrderDetails';
 import type { Order, OrderStatus } from '@/types/orders';
 import { API_BASE_URL, buildUrl, withAuthHeaders } from '@/utils/api';
+import {usePermissions} from "@/components/hooks/usePermissions";
 
 const OrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -40,6 +41,7 @@ const OrdersPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [total, setTotal] = useState(0);
+  const { canEditResource } = usePermissions();
 
   const fetchOrders = async () => {
     try {
@@ -130,7 +132,7 @@ const OrdersPage: React.FC = () => {
             <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchOrders}>
               Обновить
             </Button>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddOrder}>
+            <Button variant="contained" disabled={!canEditResource('order', '1')} startIcon={<AddIcon />} onClick={handleAddOrder}>
               Создать заказ
             </Button>
           </Stack>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import { Box, Button, CircularProgress, Alert, Stack, Typography, FormControl, InputLabel, Select, MenuItem, TablePagination } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Layout from '@/components/Layout/Layout';
@@ -8,6 +8,7 @@ import ProductForm from '@/components/Products/ProductForm';
 import ProductTable from '@/components/Products/ProductTable';
 import type { ProductListItem } from '@/types/products';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
+import {usePermissions} from "@/components/hooks/usePermissions";
 
 const ProductsPage: React.FC = () => {
   const [products, setProducts] = useState<ProductListItem[]>([]);
@@ -19,6 +20,7 @@ const ProductsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [total, setTotal] = useState(0);
+  const { canEditResource } = usePermissions();
 
   const fetchProducts = async (p = page, limit = rowsPerPage, filter = filterMode) => {
     try {
@@ -88,7 +90,7 @@ const ProductsPage: React.FC = () => {
                 <MenuItem value="ingredients">Только ингредиенты</MenuItem>
               </Select>
             </FormControl>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+            <Button variant="contained" disabled={!canEditResource('products', '1')} startIcon={<AddIcon />} onClick={handleCreate}>
               Добавить товар
             </Button>
           </Stack>

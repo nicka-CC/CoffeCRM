@@ -21,6 +21,7 @@ import EmployeeForm from '@/components/Employees/EmployeeForm';
 import EmployeeKPIDialog from '@/components/Employees/EmployeeKPIDialog';
 import type { Employee } from '@/types/employees';
 import { API_BASE_URL, buildUrl, withAuthHeaders } from '@/utils/api';
+import {usePermissions} from "@/components/hooks/usePermissions";
 
 const EmployeesPage: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -36,8 +37,10 @@ const EmployeesPage: React.FC = () => {
     branchId: '',
     search: '',
   });
+  const { canEditResource } = usePermissions();
 
   const fetchEmployees = async () => {
+
     try {
       setLoading(true);
       const params: Record<string, string> = {};
@@ -132,7 +135,7 @@ const EmployeesPage: React.FC = () => {
             <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchEmployees}>
               Обновить
             </Button>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddEmployee}>
+            <Button disabled={!canEditResource('products', '1')} variant="contained" startIcon={<AddIcon />} onClick={handleAddEmployee}>
               Добавить сотрудника
             </Button>
           </Stack>

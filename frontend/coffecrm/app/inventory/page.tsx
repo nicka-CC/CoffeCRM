@@ -36,6 +36,7 @@ import InventoryTransactionDialog from '@/components/Inventory/InventoryTransact
 import type { StockOverviewItem, LowStockAlert } from '@/types/inventory';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
 import { formatCurrency, formatDateTime, formatNumber } from '@/utils/formatters';
+import {usePermissions} from "@/components/hooks/usePermissions";
 
 const InventoryPage: React.FC = () => {
   const [overview, setOverview] = useState<StockOverviewItem[]>([]);
@@ -48,6 +49,7 @@ const InventoryPage: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState<StockOverviewItem | null>(null);
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
+  const { canEditResource } = usePermissions();
 
   const fetchData = async () => {
     try {
@@ -156,7 +158,7 @@ const InventoryPage: React.FC = () => {
                       <TableCell align="right">Доступно</TableCell>
                       <TableCell align="right">Стоимость</TableCell>
                       <TableCell align="right">Статус</TableCell>
-                      <TableCell align="right">Действия</TableCell>
+                      <TableCell align="right" >Действия</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -236,7 +238,7 @@ const InventoryPage: React.FC = () => {
                             </TableCell>
                             <TableCell align="right">
                               <Tooltip title="Зарегистрировать движение">
-                                <IconButton color="primary" onClick={() => handleRegister(item)} size="small">
+                                <IconButton  color="primary" disabled={!canEditResource('products', '1')} onClick={() => handleRegister(item)} size="small">
                                   <AddIcon />
                                 </IconButton>
                               </Tooltip>

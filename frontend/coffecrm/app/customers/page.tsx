@@ -23,6 +23,7 @@ import CustomerForm from '@/components/Customers/CustomerForm';
 import type { Customer } from '@/types/customers';
 import { API_BASE_URL, buildUrl, withAuthHeaders } from '@/utils/api';
 import { formatCurrency } from '@/utils/formatters';
+import {usePermissions} from "@/components/hooks/usePermissions";
 
 const CustomersPage: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -35,6 +36,7 @@ const CustomersPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [total, setTotal] = useState(0);
+  const { canEditResource } = usePermissions();
 
   const fetchCustomers = async () => {
     try {
@@ -121,7 +123,7 @@ const CustomersPage: React.FC = () => {
             <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchCustomers}>
               Обновить
             </Button>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddCustomer}>
+            <Button variant="contained" disabled={!canEditResource('products', '1')} startIcon={<AddIcon />} onClick={handleAddCustomer}>
               Добавить клиента
             </Button>
           </Stack>

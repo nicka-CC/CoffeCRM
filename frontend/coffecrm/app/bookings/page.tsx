@@ -29,6 +29,7 @@ import BookingCalendar from '@/components/Bookings/BookingCalendar';
 import type { Booking, BookingStatus, BookingType } from '@/types/bookings';
 import { API_BASE_URL, buildUrl, withAuthHeaders } from '@/utils/api';
 import { formatCurrency } from '@/utils/formatters';
+import {usePermissions} from "@/components/hooks/usePermissions";
 
 const BookingsPage: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -49,7 +50,7 @@ const BookingsPage: React.FC = () => {
     dateFrom: '',
     dateTo: '',
   });
-
+  const { canEditResource } = usePermissions();
   const fetchBookings = async () => {
     try {
       setLoading(true);
@@ -206,7 +207,7 @@ const BookingsPage: React.FC = () => {
             <Button variant="outlined" startIcon={<RefreshIcon />} onClick={fetchBookings}>
               Обновить
             </Button>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddBooking}>
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddBooking} disabled={!canEditResource('products', '1')}>
               Создать бронирование
             </Button>
           </Stack>
