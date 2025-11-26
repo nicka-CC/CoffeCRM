@@ -19,6 +19,7 @@ import type { User } from '@/types/employees';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
 
 import { usePermissions } from '@/components/hooks/usePermissions';
+import FormTextField from '@/components/UI/FormField';
 interface CustomerFormProps {
   open: boolean;
   onClose: () => void;
@@ -43,8 +44,9 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSuccess, c
     source: '',
     birthday: '',
   });
-  const { canEditResource } = usePermissions();
+  const { canEditResource, canCreateResource } = usePermissions();
   const editable = canEditResource('customer', customer?.id);
+  const allowedToSubmit = isEdit ? editable : canCreateResource('customer');
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -163,7 +165,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSuccess, c
           <Grid container spacing={2}>
             {!isEdit && (
               <Grid item xs={12}>
-                <TextField
+                <FormTextField
                   select
                   required
                   label="Пользователь"
@@ -177,12 +179,12 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSuccess, c
                       {user.fullName} ({user.email})
                     </MenuItem>
                   ))}
-                </TextField>
+                </FormTextField>
               </Grid>
             )}
 
             <Grid item xs={12} md={6}>
-              <TextField
+              <FormTextField
                 label="Бонусы"
                 name="bonus"
                 type="number"
@@ -194,7 +196,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSuccess, c
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <TextField
+              <FormTextField
                 label="Процент скидки"
                 name="discountPercent"
                 type="number"
@@ -219,7 +221,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSuccess, c
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <TextField
+              <FormTextField
                 label="Источник"
                 name="source"
                 value={form.source}
@@ -230,7 +232,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSuccess, c
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <TextField
+              <FormTextField
                 label="День рождения"
                 name="birthday"
                 type="date"
@@ -242,7 +244,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSuccess, c
             </Grid>
 
             <Grid item xs={12}>
-              <TextField
+              <FormTextField
                 label="Теги (через запятую)"
                 name="tags"
                 value={form.tags}
@@ -253,7 +255,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSuccess, c
             </Grid>
 
             <Grid item xs={12}>
-              <TextField
+              <FormTextField
                 label="Заметки"
                 name="notes"
                 value={form.notes}
@@ -267,7 +269,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSuccess, c
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Отмена</Button>
-          <Button type="submit" variant="contained" disabled={loading}>
+          <Button type="submit" variant="contained" disabled={loading || !allowedToSubmit}>
             {isEdit ? 'Сохранить' : 'Добавить'}
           </Button>
         </DialogActions>

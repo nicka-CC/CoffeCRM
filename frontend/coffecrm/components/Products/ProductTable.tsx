@@ -35,7 +35,7 @@ interface ProductTableProps {
 
 const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onRefresh }) => {
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
-  const { canDeleteResource } = usePermissions();
+  const { canDeleteResource, canEditResource } = usePermissions();
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Удалить товар?')) return;
@@ -117,9 +117,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onEdit, onRefresh
                   </TableCell>
                   <TableCell align="right">
                     <Tooltip title="Редактировать">
-                      <IconButton onClick={() => onEdit(product)}>
+                      <span>
+                      <IconButton onClick={() => onEdit(product)} disabled={!canEditResource('product', product.id)}>
                         <EditIcon />
                       </IconButton>
+                      </span>
                     </Tooltip>
                     <Tooltip title="Удалить">
                       <span>

@@ -6,12 +6,13 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Button,
   Grid,
   Box,
 } from '@mui/material';
+import FormTextField from '@/components/UI/FormField';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
+import { usePermissions } from '@/components/hooks/usePermissions';
 import type { BranchSummary } from '@/types/branches';
 
 interface BranchFormProps {
@@ -24,6 +25,8 @@ interface BranchFormProps {
 const BranchForm: React.FC<BranchFormProps> = ({ open, onClose, onSuccess, initial }) => {
   const isEdit = Boolean(initial?.id);
   const [loading, setLoading] = useState(false);
+  const { canEditResource, canCreateResource } = usePermissions();
+  const allowedToSubmit = isEdit ? canEditResource('branch', initial?.id) : canCreateResource('branch');
   const [form, setForm] = useState({
     name: '',
     city: '',
@@ -101,31 +104,31 @@ const BranchForm: React.FC<BranchFormProps> = ({ open, onClose, onSuccess, initi
         <DialogContent dividers>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TextField label="Название" name="name" value={form.name} onChange={handleChange} fullWidth required />
+              <FormTextField label="Название" name="name" value={form.name} onChange={handleChange} required />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField label="Город" name="city" value={form.city} onChange={handleChange} fullWidth required />
+              <FormTextField label="Город" name="city" value={form.city} onChange={handleChange} required />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField label="Адрес" name="address" value={form.address} onChange={handleChange} fullWidth required />
+              <FormTextField label="Адрес" name="address" value={form.address} onChange={handleChange} required />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField label="Телефон" name="phone" value={form.phone} onChange={handleChange} fullWidth />
+              <FormTextField label="Телефон" name="phone" value={form.phone} onChange={handleChange} />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField label="Email" name="email" value={form.email} onChange={handleChange} fullWidth />
+              <FormTextField label="Email" name="email" value={form.email} onChange={handleChange} />
             </Grid>
             <Grid item xs={6} md={3}>
-              <TextField label="Широта" name="latitude" value={form.latitude} onChange={handleChange} fullWidth />
+              <FormTextField label="Широта" name="latitude" value={form.latitude} onChange={handleChange} />
             </Grid>
             <Grid item xs={6} md={3}>
-              <TextField label="Долгота" name="longitude" value={form.longitude} onChange={handleChange} fullWidth />
+              <FormTextField label="Долгота" name="longitude" value={form.longitude} onChange={handleChange} />
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+          <DialogActions>
           <Button onClick={onClose}>Отмена</Button>
-          <Button type="submit" variant="contained" disabled={loading}>{isEdit ? 'Сохранить' : 'Создать'}</Button>
+          <Button type="submit" variant="contained" disabled={loading || !allowedToSubmit}>{isEdit ? 'Сохранить' : 'Создать'}</Button>
         </DialogActions>
       </Box>
     </Dialog>

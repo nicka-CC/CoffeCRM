@@ -53,7 +53,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
     status: 'NEW' as OrderStatus,
     items: [] as Array<{ productId: string; quantity: number; price: number; productName?: string }>,
   });
-  const { canEditResource } = usePermissions();
+  const { canEditResource, canCreateResource, canDeleteResource } = usePermissions();
   const editable = canEditResource('order', order?.id);
 
   useEffect(() => {
@@ -271,7 +271,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                   Товары в заказе
                 </Typography>
-                <Button startIcon={<AddIcon />} onClick={handleAddItem} size="small">
+                <Button startIcon={<AddIcon />} onClick={handleAddItem} size="small" disabled={!!canCreateResource('order') || !editable}>
                   Добавить товар
                 </Button>
               </Box>
@@ -339,7 +339,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
                           </Typography>
                         </Grid>
                         <Grid item xs={1} md={1}>
-                          <IconButton size="small" color="error" onClick={() => handleRemoveItem(index)} disabled={!editable}>
+                          <IconButton size="small" color="error" onClick={() => handleRemoveItem(index)} disabled={!canDeleteResource('order')}>
                             <DeleteIcon />
                           </IconButton>
                         </Grid>

@@ -12,6 +12,8 @@ import {
   Alert,
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
+import FormTextField from '@/components/UI/FormField';
+import { usePermissions } from '@/components/hooks/usePermissions';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
 
 const CompanySettings: React.FC = () => {
@@ -41,6 +43,9 @@ const CompanySettings: React.FC = () => {
   useEffect(() => {
     fetchCompany();
   }, []);
+
+  const { canCreateResource } = usePermissions();
+  const allowedToSubmit = canCreateResource('settings');
 
   const fetchCompany = async () => {
     try {
@@ -127,7 +132,7 @@ const CompanySettings: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <TextField
+          <FormTextField
             label="Название компании"
             name="name"
             value={form.name}
@@ -138,7 +143,7 @@ const CompanySettings: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <TextField
+          <FormTextField
             label="Юридическое название"
             name="legalName"
             value={form.legalName}
@@ -148,7 +153,7 @@ const CompanySettings: React.FC = () => {
         </Grid>
 
         <Grid item xs={12}>
-          <TextField
+          <FormTextField
             label="Описание"
             name="description"
             value={form.description}
@@ -166,7 +171,7 @@ const CompanySettings: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <TextField
+          <FormTextField
             label="ИНН"
             name="inn"
             value={form.inn}
@@ -176,7 +181,7 @@ const CompanySettings: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <TextField
+          <FormTextField
             label="КПП"
             name="kpp"
             value={form.kpp}
@@ -186,7 +191,7 @@ const CompanySettings: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <TextField
+          <FormTextField
             label="ОГРН"
             name="ogrn"
             value={form.ogrn}
@@ -196,7 +201,7 @@ const CompanySettings: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <TextField
+          <FormTextField
             label="Юридический адрес"
             name="address"
             value={form.address}
@@ -206,7 +211,7 @@ const CompanySettings: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <TextField
+          <FormTextField
             label="Фактический адрес"
             name="actualAddress"
             value={form.actualAddress}
@@ -299,7 +304,7 @@ const CompanySettings: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <TextField
+          <FormTextField
             label="Директор"
             name="director"
             value={form.director}
@@ -309,7 +314,7 @@ const CompanySettings: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <TextField
+          <FormTextField
             label="Бухгалтер"
             name="accountant"
             value={form.accountant}
@@ -323,7 +328,7 @@ const CompanySettings: React.FC = () => {
             type="submit"
             variant="contained"
             startIcon={<SaveIcon />}
-            disabled={saving}
+            disabled={saving || !allowedToSubmit}
             sx={{ mt: 2 }}
           >
             {saving ? 'Сохранение...' : 'Сохранить'}

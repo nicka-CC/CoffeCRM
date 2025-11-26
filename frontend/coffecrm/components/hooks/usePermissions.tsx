@@ -62,17 +62,25 @@ export function usePermissions() {
       // fallback to editors
       return role === 'EDITE';
     },
-    // Can delete resources: default to admin-only for sensitive resources
+    // Can delete resources: make deletions admin-only. Editors cannot delete.
     canDeleteResource: (resource: string, targetId?: string) => {
       if (!role) return false;
-      // only admin can delete products and categories
-      if (resource === 'product' || resource === 'category') return role === 'ADMIN';
-      // users have separate helper
-      if (resource === 'user') return role === 'ADMIN';
-      // roles management only admin
-      if (resource === 'role') return role === 'ADMIN';
-      // other resources: editors and admins can delete
-      return role === 'ADMIN' || role === 'EDITE';
+      // Admin is the only role allowed to delete sensitive resources
+      if (role === 'ADMIN') return true;
+      // No other role is allowed to delete by default
+      return false;
+    },
+    // Can create resources: admin and editors can create most resources; readers cannot.
+    canCreateResource: (resource: string) => {
+      if (!role) return false;
+      if (role === 'ADMIN') return true;
+      // Editors can create many resources but not change roles
+      if (role === 'EDITE' || role === 'EDITOR' || role === 'MOD') {
+        if (resource === 'role') return false; // only admins manage roles
+        return true;
+      }
+      // Read-only users cannot create
+      return false;
     },
   }), [role, userId]);
 

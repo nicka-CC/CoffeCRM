@@ -96,8 +96,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ open, onClose, onSuccess, boo
     tags: '',
   });
 
-  const { canEditResource } = usePermissions();
+  const { canEditResource, canCreateResource } = usePermissions();
   const editable = canEditResource('booking', booking?.id);
+  const allowedToSubmit = isEdit ? editable : canCreateResource('booking');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -620,7 +621,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ open, onClose, onSuccess, boo
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Отмена</Button>
-          <Button type="submit" variant="contained" disabled={loading || !editable}>
+          <Button type="submit" variant="contained" disabled={loading || !allowedToSubmit}>
             {isEdit ? 'Сохранить' : 'Создать'}
           </Button>
         </DialogActions>

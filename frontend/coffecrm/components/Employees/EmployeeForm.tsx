@@ -16,6 +16,8 @@ import type { Employee, CreateEmployeeDto, UpdateEmployeeDto } from '@/types/emp
 import type { BranchSummary } from '@/types/branches';
 import type { User } from '@/types/employees';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
+import FormTextField from '@/components/UI/FormField';
+import { usePermissions } from '@/components/hooks/usePermissions';
 
 interface EmployeeFormProps {
   open: boolean;
@@ -29,6 +31,8 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ open, onClose, onSuccess, e
   const [branches, setBranches] = useState<BranchSummary[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
+  const { canEditResource, canCreateResource } = usePermissions();
+  const allowedToSubmit = isEdit ? canEditResource('employee', employee?.id) : canCreateResource('employee');
   const [form, setForm] = useState({
     userId: '',
     position: '',
@@ -138,7 +142,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ open, onClose, onSuccess, e
         <DialogContent dividers>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TextField
+              <FormTextField
                 select
                 required
                 label="Пользователь"
@@ -153,10 +157,10 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ open, onClose, onSuccess, e
                     {user.fullName} ({user.email}) - {user.role}
                   </MenuItem>
                 ))}
-              </TextField>
+              </FormTextField>
             </Grid>
             <Grid item xs={12}>
-              <TextField
+              <FormTextField
                 required
                 label="Должность"
                 name="position"
@@ -166,7 +170,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ open, onClose, onSuccess, e
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField
+              <FormTextField
                 label="Зарплата"
                 name="salary"
                 type="number"
@@ -177,7 +181,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ open, onClose, onSuccess, e
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField
+              <FormTextField
                 select
                 label="Филиал"
                 name="branchId"
@@ -191,13 +195,13 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ open, onClose, onSuccess, e
                     {branch.name} ({branch.city})
                   </MenuItem>
                 ))}
-              </TextField>
+              </FormTextField>
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Отмена</Button>
-          <Button type="submit" variant="contained" disabled={loading}>
+          <Button type="submit" variant="contained" disabled={loading || !allowedToSubmit}>
             {isEdit ? 'Сохранить' : 'Создать'}
           </Button>
         </DialogActions>

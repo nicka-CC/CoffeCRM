@@ -19,6 +19,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import type { Booking, BookingStatus } from '@/types/bookings';
 import { formatCurrency, formatDateTime } from '@/utils/formatters';
+import { usePermissions } from '@/components/hooks/usePermissions';
 
 interface BookingTableProps {
   bookings: Booking[];
@@ -59,6 +60,7 @@ const BookingTable: React.FC<BookingTableProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const { canEditResource } = usePermissions();
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
       <Table>
@@ -136,26 +138,33 @@ const BookingTable: React.FC<BookingTableProps> = ({
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Редактировать">
-                  <IconButton size="small" onClick={() => onEdit(booking)}>
+                  <span>
+                  <IconButton size="small" onClick={() => onEdit(booking)} disabled={!canEditResource('booking', booking.id)}>
                     <EditIcon />
                   </IconButton>
+                  </span>
                 </Tooltip>
                 {booking.status === 'PENDING' && (
                   <Tooltip title="Подтвердить">
+                    <span>
                     <IconButton
                       size="small"
                       color="success"
                       onClick={() => onConfirm(booking.id)}
+                      disabled={!canEditResource('booking', booking.id)}
                     >
                       <CheckCircleIcon />
                     </IconButton>
+                    </span>
                   </Tooltip>
                 )}
                 {booking.status !== 'CANCELED' && booking.status !== 'COMPLETED' && (
                   <Tooltip title="Отменить">
-                    <IconButton size="small" color="error" onClick={() => onCancel(booking.id)}>
+                    <span>
+                    <IconButton size="small" color="error" onClick={() => onCancel(booking.id)} disabled={!canEditResource('booking', booking.id)}>
                       <CancelIcon />
                     </IconButton>
+                    </span>
                   </Tooltip>
                 )}
               </TableCell>

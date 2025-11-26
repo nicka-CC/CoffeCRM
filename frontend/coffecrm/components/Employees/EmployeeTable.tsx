@@ -20,6 +20,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import type { Employee } from '@/types/employees';
+import { usePermissions } from '@/components/hooks/usePermissions';
 import { formatCurrency } from '@/utils/formatters';
 
 interface EmployeeTableProps {
@@ -44,6 +45,7 @@ const roleLabels: Record<string, string> = {
 };
 
 const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, onEdit, onDelete, onViewKPI }) => {
+  const { canEditResource, canDeleteResource } = usePermissions();
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
       <Table>
@@ -93,14 +95,18 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({ employees, onEdit, onDele
               </TableCell>
               <TableCell align="right">
                 <Tooltip title="Редактировать">
-                  <IconButton size="small" onClick={() => onEdit(employee)}>
+                  <span>
+                  <IconButton size="small" onClick={() => onEdit(employee)} disabled={!canEditResource('employee', employee.id)}>
                     <EditIcon />
                   </IconButton>
+                  </span>
                 </Tooltip>
                 <Tooltip title="Удалить">
-                  <IconButton size="small" color="error" onClick={() => onDelete(employee.id)}>
+                  <span>
+                  <IconButton size="small" color="error" onClick={() => onDelete(employee.id)} disabled={!canDeleteResource('employee')}>
                     <DeleteIcon />
                   </IconButton>
+                  </span>
                 </Tooltip>
               </TableCell>
             </TableRow>

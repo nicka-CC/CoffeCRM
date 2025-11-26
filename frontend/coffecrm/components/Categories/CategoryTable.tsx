@@ -27,7 +27,7 @@ interface CategoryTableProps {
 }
 
 const CategoryTable: React.FC<CategoryTableProps> = ({ categories, onEdit, onDelete }) => {
-  const { canDeleteResource } = usePermissions();
+  const { canDeleteResource, canEditResource } = usePermissions();
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
       <Table>
@@ -61,9 +61,11 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ categories, onEdit, onDel
               </TableCell>
               <TableCell align="right">
                 <Tooltip title="Редактировать">
-                  <IconButton size="small" onClick={() => onEdit(category)}>
+                  <span>
+                  <IconButton size="small" onClick={() => onEdit(category)} disabled={!canEditResource('category', category.id)}>
                     <EditIcon />
                   </IconButton>
+                  </span>
                 </Tooltip>
                 <Tooltip title="Удалить">
                   <span>

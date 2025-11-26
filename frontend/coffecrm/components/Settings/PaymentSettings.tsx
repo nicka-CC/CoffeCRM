@@ -36,7 +36,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 import { API_BASE_URL, withAuthHeaders } from '@/utils/api';
-
+import { usePermissions } from '@/components/hooks/usePermissions';
 interface PaymentSetting {
   id?: string;
   companyId: string;
@@ -87,6 +87,7 @@ const PaymentSettings: React.FC = () => {
 
   const fetchSettings = async () => {
     try {
+    const { canCreateResource } = usePermissions();
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/settings/payment`, {
         headers: withAuthHeaders(),

@@ -37,224 +37,7 @@ export class AnalyticsService {
       peakHours,
     };
   }
-   async generateExcel(title: string, rows: Array<Record<string, unknown>>) {
-    // @ts-ignore
-     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Отчет');
 
-    // Add title
-    const titleRow = worksheet.addRow([title]);
-    titleRow.font = { size: 16, bold: true };
-    worksheet.mergeCells('A1:B1');
-
-    // Add date
-    const dateRow = worksheet.addRow([`Дата формирования: ${new Date().toLocaleString('ru-RU')}`]);
-    dateRow.font = { italic: true };
-    worksheet.mergeCells('A2:B2');
-
-    // Add empty row
-    worksheet.addRow([]);
-
-    // Add headers
-    if (rows.length > 0) {
-      const headers = Object.keys(rows[0]);
-      const headerRow = worksheet.addRow(headers);
-      headerRow.font = { bold: true };
-      headerRow.eachCell((cell) => {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFE0E0E0' }
-        };
-        cell.border = {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' }
-        };
-      });
-
-      // Add data
-      rows.forEach(row => {
-        const rowData = headers.map(header => {
-          const value = row[header];
-          if (header.toLowerCase().includes('date') && value instanceof Date) {
-            return value.toLocaleDateString('ru-RU');
-          }
-          if (header.toLowerCase().includes('revenue') ||
-              header.toLowerCase().includes('price') ||
-              header.toLowerCase().includes('total')) {
-            return Number(value) || 0;
-          }
-          return value;
-        });
-        const dataRow = worksheet.addRow(rowData);
-
-        // Format numeric cells
-        headers.forEach((header, index) => {
-          const cell = dataRow.getCell(index + 1);
-          if (header.toLowerCase().includes('revenue') ||
-              header.toLowerCase().includes('price') ||
-              header.toLowerCase().includes('total')) {
-            cell.numFmt = '#,##0.00 ₽';
-          }
-        });
-      });
-
-      // Auto fit columns
-      worksheet.columns.forEach(column => {
-        let maxLength = 0;
-        column.eachCell({ includeEmpty: true }, cell => {
-          const columnLength = cell.value ? cell.value.toString().length : 0;
-          if (columnLength > maxLength) {
-            maxLength = columnLength;
-          }
-        });
-        column.width = Math.min(Math.max(maxLength + 2, 15), 50);
-      });
-    }
-
-    return await workbook.xlsx.writeBuffer();
-  }
-
-   async generatePdf(title: string, rows: Array<Record<string, unknown>>) {
-    const doc = new (PDFDocument as any)({
-      margin: 40,
-      size: 'A4',
-      info: {
-        Title: title,
-        Author: 'CoffeeCRM',
-        Creator: 'CoffeeCRM',
-        CreationDate: new Date(),
-      }
-    });
-
-    const buffers: Buffer[] = [];
-    doc.on('data', (chunk: Buffer) => buffers.push(chunk));
-
-    const ready = new Promise<Buffer>((resolve) => {
-      doc.on('end', () => resolve(Buffer.concat(buffers)));
-    });
-
-    // Add header
-    doc
-        .fontSize(20)
-        .font('Helvetica-Bold')
-        .text(title, { align: 'center' })
-        .moveDown(0.5);
-
-    // Add date
-    doc
-        .fontSize(10)
-        .font('Helvetica')
-        .text(`Дата формирования: ${new Date().toLocaleString('ru-RU')}`, { align: 'right' })
-        .moveDown(1);
-
-    if (rows.length === 0) {
-      doc.font('Helvetica').text('Нет данных для отображения', { align: 'center' });
-      doc.end();
-      return ready;
-    }
-
-    const headers = Object.keys(rows[0]);
-    const columnWidths: Record<number, number> = {};
-    const rowHeight = 20;
-    const margin = 40;
-    const pageWidth = doc.page.width - margin * 2;
-    const columnCount = headers.length;
-    const columnWidth = pageWidth / columnCount;
-
-    // Calculate column widths
-    headers.forEach((header, i) => {
-      let maxLength = header.length;
-      rows.forEach(row => {
-        const value = row[header];
-        const length = value ? value.toString().length : 0;
-        if (length > maxLength) {
-          maxLength = length;
-        }
-      });
-      columnWidths[i] = Math.min(columnWidth, maxLength * 7 + 10);
-    });
-
-    // Adjust column widths to fit page
-    const totalWidth = Object.values(columnWidths).reduce((a, b) => a + b, 0);
-    const scale = Math.min(1, pageWidth / totalWidth);
-    Object.keys(columnWidths).forEach(key => {
-      columnWidths[parseInt(key)] *= scale;
-    });
-
-    // Draw table headers
-    let x = margin;
-    headers.forEach((header, i) => {
-      doc
-          .rect(x, doc.y, columnWidths[i], rowHeight)
-          .fillAndStroke('#f0f0f0', '#000000');
-
-      doc
-          .font('Helvetica-Bold')
-          .fontSize(10)
-          .fillColor('#000000')
-          .text(header, x + 5, doc.y + 5, {
-            width: columnWidths[i] - 10,
-            align: 'left',
-            lineBreak: false
-          });
-
-      x += columnWidths[i];
-    });
-
-    doc.y += rowHeight;
-
-    // Draw table rows
-    rows.forEach((row, rowIndex) => {
-      const startY = doc.y;
-      let maxHeight = rowHeight;
-
-      // Calculate max height for this row
-      headers.forEach((header, i) => {
-        const value = row[header];
-        const text = value !== undefined && value !== null ? value.toString() : '';
-        const height = Math.ceil(doc.widthOfString(text) / (columnWidths[i] - 10)) * doc.currentLineHeight();
-        maxHeight = Math.max(maxHeight, height);
-      });
-
-      // Draw row background
-      doc
-          .rect(margin, startY, pageWidth, maxHeight)
-          .fillAndStroke(rowIndex % 2 === 0 ? '#ffffff' : '#f9f9f9', '#000000');
-
-      // Draw cell content
-      let x = margin;
-      headers.forEach((header, i) => {
-        const value = row[header];
-        const text = value !== undefined && value !== null ? value.toString() : '';
-
-        doc
-            .font('Helvetica')
-            .fontSize(10)
-            .fillColor('#000000')
-            .text(text, x + 5, startY + 5, {
-              width: columnWidths[i] - 10,
-              align: 'left',
-              lineBreak: true
-            });
-
-        x += columnWidths[i];
-      });
-
-      doc.y = startY + maxHeight;
-
-      // Add new page if needed
-      if (doc.y + rowHeight > doc.page.height - margin) {
-        doc.addPage();
-        doc.y = margin;
-      }
-    });
-
-    doc.end();
-    return ready;
-  }
   async getSalesDynamics(range: AnalyticsRange) {
     const orders = await this.prisma.order.findMany({
       where: {
@@ -550,55 +333,55 @@ export class AnalyticsService {
     return { from, to };
   }
 
-  // private async generateExcel(title: string, rows: Array<Record<string, unknown>>) {
-  //   // @ts-ignore
-  //   const workbook = new ExcelJS.Workbook();
-  //   const worksheet = workbook.addWorksheet('Report');
-  //
-  //   if (rows.length > 0) {
-  //     const columns = Object.keys(rows[0]).map((key) => ({
-  //       header: key,
-  //       key,
-  //       width: Math.max(15, key.length + 5),
-  //     }));
-  //     worksheet.columns = columns;
-  //     worksheet.addRows(rows);
-  //   }
-  //
-  //   worksheet.insertRow(1, [title]);
-  //   const columnCount = worksheet.columns?.length ?? 1;
-  //   const lastColumn = this.columnNumberToName(columnCount);
-  //   worksheet.mergeCells(`A1:${lastColumn}1`);
-  //   worksheet.getCell('A1').font = { size: 16, bold: true };
-  //
-  //   return workbook.xlsx.writeBuffer();
-  // }
+  private async generateExcel(title: string, rows: Array<Record<string, unknown>>) {
+    // @ts-ignore
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Report');
 
-  // private async generatePdf(title: string, rows: Array<Record<string, unknown>>) {
-  //   const doc = new (PDFDocument as any)({ margin: 40 });
-  //   const buffers: Buffer[] = [];
-  //
-  //   doc.on('data', (chunk) => buffers.push(chunk));
-  //
-  //   const ready = new Promise<Buffer>((resolve) => {
-  //     doc.on('end', () => resolve(Buffer.concat(buffers)));
-  //   });
-  //
-  //   doc.fontSize(18).text(title, { align: 'left' });
-  //   doc.moveDown();
-  //
-  //   rows.forEach((row) => {
-  //     Object.entries(row).forEach(([key, value]) => {
-  //       const displayValue = value instanceof Date ? value.toLocaleString('ru-RU') : value;
-  //       doc.fontSize(12).text(`${key}: ${displayValue}`);
-  //     });
-  //     doc.moveDown(0.5);
-  //   });
-  //
-  //   doc.end();
-  //
-  //   return ready;
-  // }
+    if (rows.length > 0) {
+      const columns = Object.keys(rows[0]).map((key) => ({
+        header: key,
+        key,
+        width: Math.max(15, key.length + 5),
+      }));
+      worksheet.columns = columns;
+      worksheet.addRows(rows);
+    }
+
+    worksheet.insertRow(1, [title]);
+    const columnCount = worksheet.columns?.length ?? 1;
+    const lastColumn = this.columnNumberToName(columnCount);
+    worksheet.mergeCells(`A1:${lastColumn}1`);
+    worksheet.getCell('A1').font = { size: 16, bold: true };
+
+    return workbook.xlsx.writeBuffer();
+  }
+
+  private async generatePdf(title: string, rows: Array<Record<string, unknown>>) {
+    const doc = new (PDFDocument as any)({ margin: 40 });
+    const buffers: Buffer[] = [];
+
+    doc.on('data', (chunk) => buffers.push(chunk));
+
+    const ready = new Promise<Buffer>((resolve) => {
+      doc.on('end', () => resolve(Buffer.concat(buffers)));
+    });
+
+    doc.fontSize(18).text(title, { align: 'left' });
+    doc.moveDown();
+
+    rows.forEach((row) => {
+      Object.entries(row).forEach(([key, value]) => {
+        const displayValue = value instanceof Date ? value.toLocaleString('ru-RU') : value;
+        doc.fontSize(12).text(`${key}: ${displayValue}`);
+      });
+      doc.moveDown(0.5);
+    });
+
+    doc.end();
+
+    return ready;
+  }
 
   private columnNumberToName(num: number) {
     let result = '';
