@@ -1,4 +1,6 @@
-'use client';
+﻿'use client';
+
+import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 
 import React, { useEffect, useState } from 'react';
 import { Box, Grid, Typography, Alert, CircularProgress, Stack, Button } from '@mui/material';
@@ -16,7 +18,8 @@ const BranchesPage: React.FC = () => {
   const [branches, setBranches] = useState<BranchSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [formOpen, setFormOpen] = useState(false);
+    const [formOpen, setFormOpen] = useState(false);
+  const [selectedBranchId, setSelectedBranchId] = useState<number | null>(null);
 
   const perms = usePermissions();
 
@@ -104,7 +107,8 @@ const BranchesPage: React.FC = () => {
               <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }} color="textSecondary">
                 Карта сети
               </Typography>
-              <BranchesMap branches={branches} />
+
+                <BranchesMap branches={branches} selectedBranchId={selectedBranchId} onBranchSelect={setSelectedBranchId} />
             </Box>
 
             <Box>
@@ -142,4 +146,10 @@ const BranchesPage: React.FC = () => {
 };
 
 export default BranchesPage;
+
+
+
+
+
+
 

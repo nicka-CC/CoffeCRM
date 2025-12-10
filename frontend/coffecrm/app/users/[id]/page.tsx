@@ -234,7 +234,7 @@ export default function UserEditPage({params}: { params: { id: string } }) {
                     </Button>
                 </form>
                 <div>
-                    пользователь замешен в:
+
                 </div>
             </div>
         </Layout>

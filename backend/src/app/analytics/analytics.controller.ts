@@ -11,7 +11,7 @@ import {JwtAuthGuard} from "../../jwt-auth.guard";
 @Controller('analytics')
 @UseGuards(JwtAuthGuard)
 export class AnalyticsController {
-  constructor(private readonly analyticsService: AnalyticsService) {}
+  constructor( readonly analyticsService: AnalyticsService) {}
 
   @Get()
   @ApiOperation({ summary: 'Получить аналитику' })

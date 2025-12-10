@@ -110,68 +110,68 @@ const Sidebar: React.FC<SidebarProps> = ({open, onClose}) => {
         {
             header: 'Основное',
             items: [
-                {title: 'Dashboard', icon: <Dashboard/>, path: '/'},
+                {title: 'Дашборд', icon: <Dashboard/>, path: '/'},
             ],
         },
         {
-            header: 'Пользователи и роли',
+            header: 'Пользователи',
             items: [
-                {title: 'Users', icon: <People/>, path: '/users'},
+                {title: 'Пользователи', icon: <People/>, path: '/users'},
             ],
         },
         {
             header: 'Филиалы',
             items: [
-                {title: 'Branches', icon: <Store/>, path: '/branches'},
+                {title: 'Филиалы', icon: <Store/>, path: '/branches'},
             ],
         },
         {
             header: 'Товары',
             items: [
-                {title: 'Products', icon: <Coffee/>, path: '/products'},
-                {title: 'Categories', icon: <Category/>, path: '/categories'},
+                {title: 'Товары', icon: <Coffee/>, path: '/products'},
+                {title: 'Категории', icon: <Category/>, path: '/categories'},
             ],
         },
         {
             header: 'Склад',
             items: [
-                {title: 'Inventory', icon: <Inventory/>, path: '/inventory'},
+                {title: 'Склад', icon: <Inventory/>, path: '/inventory'},
             ],
         },
         {
             header: 'Заказы',
             items: [
-                {title: 'Orders', icon: <ShoppingCart/>, path: '/orders'},
+                {title: 'Заказы', icon: <ShoppingCart/>, path: '/orders'},
             ],
         },
         {
             header: 'Клиенты',
             items: [
-                {title: 'Customers', icon: <Person/>, path: '/customers'},
+                {title: 'Клиенты', icon: <Person/>, path: '/customers'},
             ],
         },
         {
             header: 'Сотрудники',
             items: [
-                {title: 'Employees', icon: <Group/>, path: '/employees'},
+                {title: 'Сотрудники', icon: <Group/>, path: '/employees'},
             ],
         },
         {
             header: 'Бронирования',
             items: [
-                {title: 'Bookings', icon: <CalendarToday/>, path: '/bookings'},
+                {title: 'Бронирования', icon: <CalendarToday/>, path: '/bookings'},
             ],
         },
         {
             header: 'Аналитика',
             items: [
-                {title: 'Analytics', icon: <TrendingUp/>, path: '/analytics'},
+                {title: 'Аналитика', icon: <TrendingUp/>, path: '/analytics'},
             ],
         },
         ...(canEditResource('products', '1') ? [{
             header: 'Настройки',
             items: [
-                { title: 'Settings', icon: <Settings />, path: '/settings' },
+                { title: 'Настройки', icon: <Settings />, path: '/settings' },
             ],
         }] : []),
     ];

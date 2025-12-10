@@ -40,16 +40,16 @@ export default function LoginPage() {
 
     return (
         <LayoutAdmin
-            title="Login"
+            title="Авторизация"
         >
         <Container maxWidth="sm" style={{ display: 'flex', marginTop:'20px', flexDirection: 'column', gap: '1rem', minWidth:'500px' }}>
             <TextField
-                label="Email"
+                label="Почта"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
             />
             <TextField
-                label="Password"
+                label="Пароль"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -59,7 +59,7 @@ export default function LoginPage() {
                 onClick={handleLogin}
                 disabled={loading}
             >
-                {loading ? <CircularProgress size={24} /> : 'Login'}
+                {loading ? <CircularProgress size={24} /> : 'Войти'}
             </Button>
             {error && <p style={{ color: 'red' }}>{error}</p>}
         </Container>

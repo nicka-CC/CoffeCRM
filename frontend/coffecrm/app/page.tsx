@@ -205,32 +205,6 @@ export default function Home() {
           </Grid>
         </Grid>
 
-        {/* Quick Actions */}
-        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-          Быстрые действия
-        </Typography>
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          {quickLinks?.map((link: any, index: number) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <Card sx={{ cursor: 'pointer', '&:hover': { boxShadow: 3 } }} onClick={() => handleQuickAction(link.action)}>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar sx={{ bgcolor: 'primary.main' }}>
-                      {link.icon === 'shopping-cart' && <ShoppingCart />}
-                      {link.icon === 'coffee' && <Coffee />}
-                      {link.icon === 'truck' && <Store />}
-                      {link.icon === 'user-plus' && <People />}
-                      {link.icon === 'users' && <People />}
-                    </Avatar>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {link.title}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
       </Box>
     </Layout>
   );

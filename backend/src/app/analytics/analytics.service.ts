@@ -333,7 +333,7 @@ export class AnalyticsService {
     return { from, to };
   }
 
-  private async generateExcel(title: string, rows: Array<Record<string, unknown>>) {
+  async generateExcel(title: string, rows: Array<Record<string, unknown>>) {
     // @ts-ignore
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Report');
@@ -357,7 +357,7 @@ export class AnalyticsService {
     return workbook.xlsx.writeBuffer();
   }
 
-  private async generatePdf(title: string, rows: Array<Record<string, unknown>>) {
+ async generatePdf(title: string, rows: Array<Record<string, unknown>>) {
     const doc = new (PDFDocument as any)({ margin: 40 });
     const buffers: Buffer[] = [];
 
