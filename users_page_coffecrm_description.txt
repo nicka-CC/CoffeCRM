@@ -1,0 +1,60 @@
+# CoffeCRM Users Page (users/page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The "Users" page is the administrative section for managing internal user accounts of the CoffeCRM system itself. This is distinct from the "Customers" page, which manages the coffee shop's public-facing client base. This section is intended for system administrators to manage who has access to the CRM, what their roles are, and to provide a path to edit their profiles and permissions.
+
+## 2. Page Structure and Components
+
+The page is built around a single, primary component, `UsersList`, which is rendered within the main application `Layout`.
+
+-   **Layout (`<Layout>`)**: Provides the standard sidebar navigation and header for the application.
+-   **UsersList (`<UsersList>`)**: This is the core component that contains all the logic and UI for the page.
+
+### 2.1. UsersList Component Breakdown
+
+-   **Title**: The component renders a simple `<h1>Users</h1>` heading.
+-   **User Table (`<Table>`)**: A Material-UI table is used to display a paginated list of all internal users.
+    -   **Columns**: The table provides a clear overview of each user with columns for:
+        -   Email (Primary Identifier)
+        -   Full Name
+        -   Role (e.g., "Admin", "Manager", "Barista")
+        -   Phone
+        -   Created At
+    -   **Actions Column**: This column is dynamic and permission-driven.
+-   **Pagination (`<TablePagination>`)**: Standard pagination controls at the bottom of the table handle navigation through large user lists.
+
+## 3. Data Flow and Permissions
+
+### 3.1. Data Fetching (`fetchUsers`)
+
+-   **API Endpoint**: Fetches data from a hardcoded `http://localhost:7000/user/all` endpoint.
+-   **Authentication**: The `fetch` request correctly includes an `Authorization: Bearer <token>` header by retrieving the access token from `sessionStorage`. This ensures that only authenticated users can view the user list.
+-   **Pagination**: The API call is parameterized with `page` and `limit` to fetch data in chunks, matching the pagination controls.
+-   **State**: The component manages standard state for `users`, `loading`, `page`, `limit`, and the `total` number of users.
+
+### 3.2. Role-Based Permissions (`usePermissions`)
+
+-   **Hook**: The component utilizes a custom `usePermissions` hook to implement access control.
+-   **Conditional Actions**: It calls a `canEditUser(user.id)` function from the hook to determine if the currently logged-in user has the authority to edit the user in a given table row.
+    -   If `true`, a clickable "Edit" button is rendered as a Next.js `<Link>`.
+    -   If `false`, a disabled "View" button is shown, preventing unauthorized modifications. This is a good security practice, ensuring users can only act on other users according to their defined privileges (e.g., a manager can't edit the main admin's account).
+
+## 4. User Flows
+
+### 4.1. Editing a User's Profile
+
+The primary user flow on this page is navigating to the edit page for a specific user.
+1.  An administrator navigates to the "Users" page.
+2.  The `UsersList` component fetches and displays the first page of users.
+3.  The administrator finds the user they wish to edit in the table.
+4.  They click the "Edit" button in the "Actions" column for that user.
+5.  Because the button is a `<Link>`, the application navigates to a dynamic route, such as `/users/some-user-id`.
+6.  This new page (`/users/[id]`) would then be responsible for fetching the full details of that specific user and displaying a form to edit their information (e.g., change their name, phone number, or role).
+
+### 4.2. Creating a User (Inferred)
+
+While the `UsersList.tsx` component does not contain an "Add User" button, a standard implementation would include one, likely near the "Users" title.
+1.  An admin would click "Add User".
+2.  This would navigate them to a dedicated "create user" page (e.g., `/users/new`) or open a modal form.
+3.  They would fill in the new user's details (email, password, role) and save, which would create the new user record in the database.

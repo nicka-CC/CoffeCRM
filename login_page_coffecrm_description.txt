@@ -1,0 +1,49 @@
+# CoffeCRM Login Page (login/page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The "Авторизация" (Authorization) page serves as the secure gateway to the CoffeCRM administrative application. Its sole purpose is to verify the identity of a user via their credentials (email and password) before granting them access to the internal management pages and data.
+
+## 2. Page Structure and Components
+
+The page is designed for simplicity and function, presenting a clean and focused login form.
+
+-   **Layout (`<LayoutAdmin>`)**: The form is wrapped in a specific `LayoutAdmin` component, which likely provides a minimal layout suitable for an authentication screen (e.g., centered content, application logo, no sidebar navigation).
+-   **Form Container (`<Container>`)**: A Material-UI `Container` is used to center the form and constrain its width for a clean look on all screen sizes.
+-   **Input Fields (`<TextField>`)**:
+    -   **Email**: A standard text field for the user's email address, which is used as their primary identifier.
+    -   **Password**: A password-type field that masks the user's input.
+-   **Submit Button (`<Button>`)**:
+    -   A "Войти" (Login) button to submit the form.
+    -   The button is disabled and displays a `CircularProgress` indicator while the authentication request is in progress to prevent multiple submissions and provide user feedback.
+-   **Error Display**: A simple paragraph tag (`<p>`) is used to display any error messages that occur during the login attempt, such as "Invalid credentials" or "Network error".
+
+## 3. Authentication Flow and State Management
+
+The component uses React's `useState` hook to manage the form's state and the authentication flow.
+
+### 3.1. State
+
+-   `email`: Stores the value of the email input field.
+-   `password`: Stores the value of the password input field.
+-   `loading`: A boolean that is `true` during the API call, used to disable the form and show a loading spinner.
+-   `error`: A string that holds the error message to be displayed if the login fails.
+
+### 3.2. `handleLogin` Function
+
+This asynchronous function orchestrates the entire login process:
+1.  **Initiate Login**: Sets `loading` to `true` and clears any previous errors.
+2.  **API Request**: Sends a `POST` request to the hardcoded `http://localhost:7000/auth/login` API endpoint. The request body includes the user's credentials formatted as `{ "identifier": email, "password": password }`.
+3.  **Success Handling**: If the API response is successful (`res.ok`), it proceeds to:
+    -   **Store Token**: Extracts the `access_token` from the JSON response.
+    -   **Session Storage**: Stores this token in the browser's `sessionStorage` using `sessionStorage.setItem('access_token', ...)`.
+    -   **Redirect**: Redirects the user to the `/users` page using Next.js's `useRouter`.
+4.  **Failure Handling**: If the API response indicates an error, it sets the `error` state with the message provided by the API or a generic "Authorization error" message.
+5.  **Network Error**: If the `fetch` call itself fails (e.g., due to a network issue), it sets a "Network error" message.
+6.  **Finalize**: In all cases, the `finally` block sets `loading` back to `false` to re-enable the form.
+
+## 4. Security and Implementation Notes
+
+-   **Token Storage**: The use of `sessionStorage` means the user's session is tied to the browser tab. Closing the tab will clear the token, and the user will have to log in again. This is a common and reasonably secure approach for admin panels.
+-   **Hardcoded API Endpoint**: The API URL `http://localhost:7000/auth/login` is hardcoded. In a production environment, this should be replaced with an environment variable for flexibility and security (e.g., `process.env.NEXT_PUBLIC_API_URL`).
+-   **Redirection**: After a successful login, the user is hard-redirected to the `/users` page. A more advanced implementation might redirect the user to their originally intended page or a default dashboard page.

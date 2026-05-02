@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { PrismaService } from "../prisma/prisma/prisma.service";
 import {AuthModule} from './user/auth/auth.module'
@@ -16,9 +17,13 @@ import { AnalyticsModule } from "./app/analytics/analytics.module";
 import { CategoryModule } from "./app/category/category.module";
 import { BookingModule } from "./app/booking/booking.module";
 import { SettingsModule } from "./app/settings/settings.module";
+import { CacheModule } from './cache/cache.module';
+import { CacheInterceptor } from './cache/cache.interceptor';
+import { CacheClearInterceptor } from './cache/cache-clear.interceptor';
 
 @Module({
   imports: [
+    CacheModule,
     AuthModule,
     ProductModule,
     UserModule,
@@ -34,6 +39,17 @@ import { SettingsModule } from "./app/settings/settings.module";
     SettingsModule,
   ],
   controllers: [AppController],
-  providers: [PrismaService, AppService],
+  providers: [
+    PrismaService,
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheClearInterceptor,
+    },
+  ],
 })
 export class AppModule {}

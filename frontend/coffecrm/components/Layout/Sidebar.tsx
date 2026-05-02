@@ -49,8 +49,7 @@ import {
     Group,
     Assignment,
 } from '@mui/icons-material';
-import Link from 'next/link';
-import {usePathname} from 'next/navigation';
+import {usePathname, useRouter} from 'next/navigation';
 import {useSidebar} from './SidebarContext';
 import Image from "next/image";
 import ico from "@/public/cup.svg";
@@ -63,6 +62,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({open, onClose}) => {
     const pathname = usePathname();
+    const router = useRouter();
     const {collapsed, setCollapsed} = useSidebar();
     const [expandedItems, setExpandedItems] = useState<{ [key: string]: boolean }>({});
     // Для каскадных popover
@@ -103,6 +103,12 @@ const Sidebar: React.FC<SidebarProps> = ({open, onClose}) => {
     // Закрыть popover (stack pop)
     const handlePopoverClose = (level = 0) => {
         setPopoverStack(prev => prev.slice(0, level));
+    };
+
+    // Мгновенная навигация без ожидания загрузки данных
+    const handleNavigation = (path: string) => {
+        // Мгновенный переход на страницу
+        router.push(path);
     };
 
     // Sidebar sections and items for a modern, clean look
@@ -225,21 +231,20 @@ const Sidebar: React.FC<SidebarProps> = ({open, onClose}) => {
                                 {item.icon}
                             </IconButton>
                         ) : (
-                            <Link href={item.path} style={{textDecoration: 'none', width: '100%'}}>
-                                <IconButton
-                                    sx={{
-                                        width: 48,
-                                        height: 48,
-                                        color: isActive ? '#6366f1' : '#555',
-                                        mx: 'auto',
-                                        my: 0.5,
-                                        borderRadius: 2,
-                                        background: isActive ? '#f5f7ff' : 'transparent'
-                                    }}
-                                >
-                                    {item.icon}
-                                </IconButton>
-                            </Link>
+                            <IconButton
+                                onClick={() => handleNavigation(item.path)}
+                                sx={{
+                                    width: 48,
+                                    height: 48,
+                                    color: isActive ? '#6366f1' : '#555',
+                                    mx: 'auto',
+                                    my: 0.5,
+                                    borderRadius: 2,
+                                    background: isActive ? '#f5f7ff' : 'transparent'
+                                }}
+                            >
+                                {item.icon}
+                            </IconButton>
                         )}
                     </ListItem>
                 </Tooltip>
@@ -280,35 +285,34 @@ const Sidebar: React.FC<SidebarProps> = ({open, onClose}) => {
                             />
                         </ListItemButton>
                     ) : (
-                        <Link href={item.path} style={{textDecoration: 'none', width: '100%'}}>
-                            <ListItemButton
-                                sx={{
-                                    pl: paddingLeft,
-                                    backgroundColor: isActive ? '#f5f7ff' : 'transparent',
-                                    color: isActive ? '#6366f1' : 'inherit',
-                                    borderRadius: 2,
+                        <ListItemButton
+                            onClick={() => handleNavigation(item.path)}
+                            sx={{
+                                pl: paddingLeft,
+                                backgroundColor: isActive ? '#f5f7ff' : 'transparent',
+                                color: isActive ? '#6366f1' : 'inherit',
+                                borderRadius: 2,
+                                fontWeight: isActive ? 700 : 400,
+                                mb: 0.5,
+                                '&:hover': {
+                                    backgroundColor: '#f0f1f7',
+                                },
+                            }}
+                        >
+                            {item.icon && (
+                                <ListItemIcon sx={{color: isActive ? '#6366f1' : '#bdbdbd', minWidth: 36}}>
+                                    {item.icon}
+                                </ListItemIcon>
+                            )}
+                            <ListItemText
+                                primary={item.title}
+                                primaryTypographyProps={{
+                                    fontSize: level === 0 ? 15 : 14,
                                     fontWeight: isActive ? 700 : 400,
-                                    mb: 0.5,
-                                    '&:hover': {
-                                        backgroundColor: '#f0f1f7',
-                                    },
+                                    color: isActive ? '#6366f1' : (level === 0 ? '#222' : '#666'),
                                 }}
-                            >
-                                {item.icon && (
-                                    <ListItemIcon sx={{color: isActive ? '#6366f1' : '#bdbdbd', minWidth: 36}}>
-                                        {item.icon}
-                                    </ListItemIcon>
-                                )}
-                                <ListItemText
-                                    primary={item.title}
-                                    primaryTypographyProps={{
-                                        fontSize: level === 0 ? 15 : 14,
-                                        fontWeight: isActive ? 700 : 400,
-                                        color: isActive ? '#6366f1' : (level === 0 ? '#222' : '#666'),
-                                    }}
-                                />
-                            </ListItemButton>
-                        </Link>
+                            />
+                        </ListItemButton>
                     )}
                 </ListItem>
                 {item.expandable && item.children && (
@@ -421,12 +425,16 @@ const Sidebar: React.FC<SidebarProps> = ({open, onClose}) => {
                                     <ListItemText primary={child.title}/>
                                 </ListItemButton>
                             ) : (
-                                <Link key={child.title} href={child.path} style={{textDecoration: 'none'}}
-                                      onClick={() => handlePopoverClose(0)}>
-                                    <ListItemButton sx={{borderRadius: 1}}>
-                                        <ListItemText primary={child.title}/>
-                                    </ListItemButton>
-                                </Link>
+                                <ListItemButton 
+                                    key={child.title}
+                                    onClick={() => {
+                                        handlePopoverClose(0);
+                                        handleNavigation(child.path);
+                                    }}
+                                    sx={{borderRadius: 1}}
+                                >
+                                    <ListItemText primary={child.title}/>
+                                </ListItemButton>
                             )
                         ))}
                     </List>

@@ -1,0 +1,78 @@
+# CoffeCRM Categories Page (categories/page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The "Категории товаров" (Product Categories) page is a fundamental administrative tool for organizing the product catalog. Its purpose is to create, manage, and delete the categories that are used to classify products (e.g., "Hot Drinks", "Cold Drinks", "Pastries", "Merchandise"). A well-structured set of categories is crucial for menu organization, inventory management, and sales reporting.
+
+## 2. Page Structure and Components
+
+This is a straightforward CRUD (Create, Read, Update, Delete) page, featuring a simple and clean layout.
+
+### 2.1. Header and Primary Actions
+
+-   **Title**: "Список категорий" (Category List).
+-   **Action Buttons**:
+    -   **Обновить (Refresh)**: Manually re-fetches the category list from the server.
+    -   **Добавить категорию (Add Category)**: The main button for creating a new category. It opens the `CategoryForm` modal and is protected by the `usePermissions` hook.
+
+### 2.2. Category Table (`<CategoryTable>`)
+
+-   **Purpose**: The central component of the page, displaying all existing product categories in a clear, tabular format.
+-   **Data**: The table is populated by the `categories` array from the component's state. It is not paginated, suggesting that the total number of categories is expected to be manageable on a single page.
+-   **Columns**:
+    -   **Name**: The name of the category.
+    -   **Description**: A brief explanation of the category.
+    -   **Actions**: A set of buttons for each category row:
+        -   **Edit**: Opens the `CategoryForm` with the selected category's data, allowing for modification.
+        -   **Delete**: Triggers the deletion process for the category.
+
+### 2.3. Category Form (`<CategoryForm>`)
+
+-   **Purpose**: A modal dialog used for both creating new categories and editing existing ones.
+-   **Fields**: Contains input fields for all category attributes:
+    -   **Name**: The required name for the category.
+    -   **Description**: An optional field to provide more context.
+-   **Actions**: Standard "Save" and "Cancel" buttons for submitting or closing the form.
+
+## 3. Data Flow and Lifecycle Management
+
+### 3.1. State
+
+-   `categories`: An array `Category[]` holding the list of all categories.
+-   `loading` & `error`: Standard state for tracking the API request status.
+-   `formOpen`: A boolean to control the visibility of the `CategoryForm` modal.
+-   `selectedCategory`: Holds the `Category` object being edited, or `null` when creating a new one.
+
+### 3.2. Data Fetching and Mutations
+
+-   **Fetch (`fetchCategories`)**: A function that sends a GET request to the `/categories` endpoint. It's called once when the component mounts and can be triggered again manually with the "Refresh" button.
+-   **Delete (`handleDeleteCategory`)**:
+    -   First, it uses a standard browser `window.confirm` dialog to ask for user confirmation, providing a simple safety check.
+    -   If confirmed, it sends a `DELETE` request to the `/categories/${id}` endpoint.
+    -   On success, it calls `fetchCategories` to update the UI with the item removed.
+    -   On failure, it shows a browser `alert` with the error message.
+-   **Create/Update**: Handled within the `CategoryForm` component. Upon successful submission, the form's `onSuccess` callback is invoked, which in turn calls `fetchCategories` to refresh the main list.
+
+## 4. User Flows
+
+### 4.1. Creating a New Category
+
+1.  User clicks the "Добавить категорию" button.
+2.  The `CategoryForm` modal appears with empty fields.
+3.  User enters a name (e.g., "Sandwiches") and an optional description.
+4.  User clicks "Save".
+5.  The form submits the data. On success, the modal closes, and the `CategoryTable` is refreshed, showing "Sandwiches" as a new entry.
+
+### 4.2. Editing a Category
+
+1.  User finds the "Pastries" category in the table and clicks its "Edit" button.
+2.  The `CategoryForm` modal appears, pre-populated with "Pastries".
+3.  The user updates the description to be more specific, e.g., "Croissants, Muffins, Cakes, and Cookies".
+4.  User clicks "Save". The modal closes, and the table updates to show the new description.
+
+### 4.3. Deleting a Category
+
+1.  User decides the "Seasonal" category is no longer needed and clicks its "Delete" button.
+2.  A browser confirmation dialog appears, asking "Удалить категорию?".
+3.  User clicks "OK".
+4.  An API request is sent to delete the category. On success, the table refreshes, and the "Seasonal" category is gone.

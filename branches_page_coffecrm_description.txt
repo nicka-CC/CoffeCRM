@@ -1,0 +1,76 @@
+# CoffeCRM Branches Page (branches/page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The "Филиалы" (Branches) page provides a comprehensive overview of the entire network of coffee shops. It's designed for regional managers, administrators, and business owners to visualize the geographical distribution of their branches and quickly assess the performance of each location. The page combines a map for spatial awareness with a grid of summary cards for at-a-glance performance metrics.
+
+## 2. Page Structure and Components
+
+The page is divided into two main, visually distinct sections, both driven by the same underlying data source.
+
+### 2.1. Header and Primary Actions
+
+-   **Title**: "Филиалы" (Branches) with a descriptive subtitle.
+-   **Create Branch Button**: Positioned at the top of the branch list, the "Создать филиал" button allows authorized users (checked via `usePermissions`) to open the `BranchForm` and add a new location to the network.
+
+### 2.2. Network Map (`<BranchesMap>`)
+
+-   **Purpose**: This component, loaded dynamically to ensure browser compatibility, renders an interactive map. It serves to give a clear geographical context to the branch network.
+-   **Features**:
+    -   **Markers**: Each branch is represented by a marker (pin) on the map at its specific latitude and longitude.
+    -   **Interactivity**: Clicking on a marker likely highlights the corresponding `BranchCard` in the list below or displays a popup with key information directly on the map. The `onBranchSelect` prop suggests that selecting a branch on the map updates the parent component's state.
+-   **Dynamic Loading**: The map is imported using `next/dynamic` with `ssr: false`, a standard practice for components that rely on browser-specific APIs like those used by mapping libraries.
+
+### 2.3. Branch List
+
+-   **Purpose**: This section provides a detailed, card-based list of all branches, allowing for easy comparison of their performance.
+-   **Layout**: A responsive `Grid` layout arranges `BranchCard` components in rows.
+-   **Branch Card (`<BranchCard>`)**: Each card is a self-contained summary of a single branch. While the component's internal code is not visible, it can be inferred that it displays:
+    -   **Branch Name**: The primary identifier.
+    -   **Address**: The physical location.
+    -   **Key Stats**: Crucial performance metrics fetched with the `withStats=true` parameter, such as revenue, order count, and possibly customer traffic.
+    -   **Actions**: Each card likely contains buttons or links to "View Details", "Edit", or navigate to a branch-specific dashboard.
+
+### 2.4. Branch Form (`<BranchForm>`)
+
+-   **Purpose**: A modal dialog used for creating new branches and likely for editing existing ones.
+-   **Fields**: The form contains all the necessary fields to define a branch, including:
+    -   Name and Address
+    -   Contact information (Phone, Email)
+    -   Geographical coordinates (Latitude, Longitude) for map placement.
+    -   Operational details (e.g., working hours, manager).
+
+## 3. Data Flow and State Management
+
+### 3.1. State
+
+-   `branches`: An array `BranchSummary[]` that stores the data for all branches, including their nested `stats` object.
+-   `loading` & `error`: Standard state for managing the API request lifecycle.
+-   `formOpen`: A boolean to control the visibility of the `BranchForm` modal.
+-   `selectedBranchId`: Stores the ID of the currently selected branch. This state is likely used to create a connection between the map and the card list (e.g., clicking a card highlights the map pin and vice-versa).
+
+### 3.2. Data Fetching (`fetchBranches` and `refetch`)
+
+-   **API Endpoint**: Fetches data from `/branches`.
+-   **Parameters**: The `withStats=true` query parameter is crucial, as it tells the backend to include performance statistics along with the basic branch details.
+-   **Triggers**:
+    -   `fetchBranches` is called once in a `useEffect` hook when the component mounts.
+    -   `refetch` is called after a new branch is successfully created via the `BranchForm`, ensuring the list and map are updated with the new data.
+-   **Data Normalization**: The code defensively maps over the API response, ensuring that properties like `phone`, `email`, `latitude`, `longitude`, and `stats` are present (even if `null`) to prevent runtime errors.
+
+## 4. User Flows
+
+### 4.1. Assessing Branch Performance
+
+1.  A manager navigates to the "Branches" page.
+2.  They first look at the `BranchesMap` to get a sense of regional coverage.
+3.  They then scroll down to the "Branch List" and scan the `BranchCard`s, comparing the "Revenue" and "Orders" stats for each location.
+4.  They notice the "Seaside Kiosk" has lower revenue. They click on its card (or map pin) which might highlight it and show more detailed actions.
+
+### 4.2. Adding a New Branch
+
+1.  The user clicks the "Создать филиал" button.
+2.  The `BranchForm` modal appears.
+3.  They enter the new branch's name, address, and other details. They might use an integrated map tool within the form to pinpoint the exact latitude and longitude.
+4.  After saving, the `onSuccess` callback is triggered. The modal closes, and the `refetch` function is called.
+5.  The page re-renders, now showing the new branch as a pin on the map and a new card in the list.

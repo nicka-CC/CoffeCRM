@@ -1,0 +1,100 @@
+# CoffeCRM Orders Page (orders/page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The "Заказы" (Orders) page is the central hub for managing the entire lifecycle of customer orders. It provides staff with the tools to view incoming orders, track their progress through various stages (e.g., New, In Progress, Completed), and perform necessary actions like creating new orders or editing existing ones. The page also offers a high-level summary of order-related metrics, making it a crucial tool for daily operations and sales analysis.
+
+## 2. Page Structure and Components
+
+This page utilizes the application's standard `Layout` for a consistent look and feel and is primarily built with Material-UI components. It features a clear separation between summary data, filtering controls, and the detailed order list.
+
+### 2.1. Header and Primary Actions
+
+-   **Title**: A prominent "Список заказов" (Order List) title.
+-   **Action Buttons**:
+    -   **Обновить (Refresh)**: A button that allows users to manually re-fetch the latest order data from the server.
+    -   **Создать заказ (Create Order)**: The primary action button for initiating a new order. This opens the `OrderForm` modal. Its visibility is controlled by the `usePermissions` hook to ensure only authorized users can create orders.
+
+### 2.2. KPI Summary Cards
+
+A grid of four `Paper` components at the top of the page provides a quick statistical overview of the orders currently displayed:
+-   **Всего заказов (Total Orders)**: Shows the total count of orders in the current view.
+-   **В работе (In Progress)**: Displays the number of orders with the "IN_PROGRESS" status.
+-   **Выполнено (Completed)**: Shows the count of orders that have been successfully completed.
+-   **Выручка (Revenue)**: Calculates and displays the total revenue from the "COMPLETED" orders in the list.
+
+### 2.3. Filter Bar
+
+A dedicated `Paper` component contains the filtering and search controls:
+-   **Status Filter (`<TextField select>`)**: A dropdown menu to filter orders by their status (e.g., "Новый", "В работе", "Готов", "Выполнен", "Отменен").
+-   **Search Bar (`<TextField>`)**: A text input field that allows users to search for specific orders by criteria like Order ID or customer name.
+
+### 2.4. Order Table (`<OrderTable>`)
+
+-   **Purpose**: The main component for displaying the list of orders.
+-   **Columns**: The table includes essential order information such as:
+    -   Order ID
+    -   Customer Name
+    -   Branch
+    -   Status (often visually represented with a colored `Chip`)
+    -   Order Total
+    -   Date/Time
+    -   **Actions**: A set of buttons for each order:
+        -   **View**: Opens the `OrderDetails` modal for a read-only, in-depth look at the order.
+        -   **Edit**: Opens the `OrderForm` modal, pre-filled with the order's data for modification.
+
+### 2.5. Modals for Order Management
+
+-   **OrderForm (`<OrderForm>`)**: A modal dialog for creating and editing orders. It likely contains fields to select a customer, add/remove products from the order, set quantities, apply discounts, and change the order status.
+-   **OrderDetails (`<OrderDetails>`)**: A read-only modal that presents a comprehensive summary of a single order, including the customer, all items, pricing breakdown, and order history/logs.
+
+### 2.6. Pagination (`<TablePagination>`)
+
+Standard pagination controls are placed below the table to handle large sets of orders, allowing users to navigate between pages and change the number of items displayed per page.
+
+## 3. Data Flow and State Management
+
+### 3.1. State
+
+The component manages a comprehensive state to handle its dynamic nature:
+-   `orders`: An array `Order[]` holding the fetched order data.
+-   `loading` & `error`: Standard state for tracking API call status.
+-   `formOpen` & `detailsOpen`: Booleans to control the visibility of the `OrderForm` and `OrderDetails` modals, respectively.
+-   `selectedOrder`: Stores the `Order` object that is currently being viewed or edited.
+-   `filters`: An object containing the current filter values (`status`, `branchId`, `search`).
+-   `page`, `rowsPerPage`, `total`: State variables for managing pagination.
+
+### 3.2. Data Fetching (`fetchOrders`)
+
+-   **API Endpoint**: Fetches data from the `/orders` endpoint.
+-   **Dynamic URL**: Uses a `buildUrl` helper to construct the request URL with the appropriate query parameters based on the current `filters`, `page`, and `rowsPerPage` state.
+-   **Triggers**: API calls are triggered by `useEffect` hooks when:
+    -   The component first mounts.
+    -   Any value in the `filters` object changes.
+    -   The `page` or `rowsPerPage` values are updated by the user.
+-   **Authentication**: All requests are sent with authentication headers via the `withAuthHeaders` utility.
+
+## 4. User Flows
+
+### 4.1. Viewing and Filtering Orders
+
+1.  User lands on the page, and the initial list of orders is fetched.
+2.  The KPI cards update to reflect the statistics of the currently loaded orders.
+3.  User selects a status (e.g., "IN_PROGRESS") from the filter dropdown.
+4.  The `filters` state updates, triggering a new API call to fetch only orders with that status.
+5.  User types a customer's name into the search bar. The list is again filtered to match the search query.
+
+### 4.2. Creating a New Order
+
+1.  User clicks "Создать заказ".
+2.  The `OrderForm` modal opens.
+3.  User selects a customer, adds products to the order, and confirms the details.
+4.  Upon saving, the form submits the data. On success, the modal closes, and the main order list is refreshed.
+
+### 4.3. Viewing and Editing an Order
+
+1.  User clicks the "View" button on an order row.
+2.  The `OrderDetails` modal appears, showing a full summary of that order.
+3.  Alternatively, the user clicks the "Edit" button.
+4.  The `OrderForm` modal appears, pre-populated with the selected order's data, allowing for modification.
+5.  After saving changes, the modal closes and the list refreshes.

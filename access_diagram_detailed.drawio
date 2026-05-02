@@ -1,0 +1,171 @@
+<mxfile host="drawio-plugin" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" modified="2026-04-12T13:56:43.528Z" etag="H4NURGO-2k7QWTg4eCgj" version="22.1.22" type="embed" pages="3">
+  <diagram name="Администратор" id="admin-diagram-detailed">
+    <mxGraphModel dx="10424" dy="11190" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="admin-root" value="Администратор" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="525" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-analytics" value="/analytics" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="80" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-bookings" value="/bookings" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="220" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-branches" value="/branches" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-branch-id" value="/branches/[id]" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-categories" value="/categories" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="500" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-customers" value="/customers" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="640" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-employees" value="/employees" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="780" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-inventory" value="/inventory" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="80" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-login" value="/login" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="220" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-orders" value="/orders" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-order-id" value="/orders/[id]" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="460" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-products" value="/products" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="500" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-product-id" value="/products/[id]" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="500" y="460" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-settings" value="/settings" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="640" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-users" value="/users" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="780" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin-user-id" value="/users/[id]" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="780" y="460" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-analytics" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-root" target="admin-analytics" edge="1" />
+        <mxCell id="edge-admin-bookings" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-root" target="admin-bookings" edge="1" />
+        <mxCell id="edge-admin-branches" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-root" target="admin-branches" edge="1" />
+        <mxCell id="edge-admin-branch-id" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-branches" target="admin-branch-id" edge="1" />
+        <mxCell id="edge-admin-categories" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-root" target="admin-categories" edge="1" />
+        <mxCell id="edge-admin-customers" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-root" target="admin-customers" edge="1" />
+        <mxCell id="edge-admin-employees" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-root" target="admin-employees" edge="1" />
+        <mxCell id="edge-admin-inventory" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-root" target="admin-inventory" edge="1" />
+        <mxCell id="edge-admin-login" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-root" target="admin-login" edge="1" />
+        <mxCell id="edge-admin-orders" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-root" target="admin-orders" edge="1" />
+        <mxCell id="edge-admin-order-id" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-orders" target="admin-order-id" edge="1" />
+        <mxCell id="edge-admin-products" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-root" target="admin-products" edge="1" />
+        <mxCell id="edge-admin-product-id" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-products" target="admin-product-id" edge="1" />
+        <mxCell id="edge-admin-settings" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-root" target="admin-settings" edge="1" />
+        <mxCell id="edge-admin-users" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-root" target="admin-users" edge="1" />
+        <mxCell id="edge-admin-user-id" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="admin-users" target="admin-user-id" edge="1" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Менеджер" id="manager-diagram-detailed">
+    <mxGraphModel dx="1705" dy="1460" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="manager-root" value="Менеджер" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="525" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-analytics" value="/analytics" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="80" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-bookings" value="/bookings" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="220" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-branches" value="/branches (view)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-categories" value="/categories" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="500" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-customers" value="/customers" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="640" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-employees" value="/employees (view)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="780" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-inventory" value="/inventory" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="80" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-login" value="/login" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="220" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-orders" value="/orders" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-order-id" value="/orders/[id]" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-products" value="/products" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="500" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-product-id" value="/products/[id]" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="500" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-settings" value="/settings (limited)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="640" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="manager-users" value="/users (clients)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="780" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-manager-analytics" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-root" target="manager-analytics" edge="1" />
+        <mxCell id="edge-manager-bookings" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-root" target="manager-bookings" edge="1" />
+        <mxCell id="edge-manager-branches" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-root" target="manager-branches" edge="1" />
+        <mxCell id="edge-manager-categories" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-root" target="manager-categories" edge="1" />
+        <mxCell id="edge-manager-customers" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-root" target="manager-customers" edge="1" />
+        <mxCell id="edge-manager-employees" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-root" target="manager-employees" edge="1" />
+        <mxCell id="edge-manager-inventory" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-root" target="manager-inventory" edge="1" />
+        <mxCell id="edge-manager-login" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-root" target="manager-login" edge="1" />
+        <mxCell id="edge-manager-orders" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-root" target="manager-orders" edge="1" />
+        <mxCell id="edge-manager-order-id" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-orders" target="manager-order-id" edge="1" />
+        <mxCell id="edge-manager-products" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-root" target="manager-products" edge="1" />
+        <mxCell id="edge-manager-product-id" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-products" target="manager-product-id" edge="1" />
+        <mxCell id="edge-manager-settings" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-root" target="manager-settings" edge="1" />
+        <mxCell id="edge-manager-users" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="manager-root" target="manager-users" edge="1" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Сотрудник" id="employee-diagram-detailed">
+    <mxGraphModel dx="1363" dy="1802" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="employee-root" value="Сотрудник" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="354" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="employee-bookings" value="/bookings" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="220" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="employee-login" value="/login" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="employee-orders" value="/orders" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="500" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="employee-order-id" value="/orders/[id] (assigned)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="500" y="260" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-employee-bookings" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="employee-root" target="employee-bookings" edge="1" />
+        <mxCell id="edge-employee-login" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="employee-root" target="employee-login" edge="1" />
+        <mxCell id="edge-employee-orders" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="employee-root" target="employee-orders" edge="1" />
+        <mxCell id="edge-employee-order-id" value="" style="endArrow=classic;html=1;rounded=0;" parent="1" source="employee-orders" target="employee-order-id" edge="1" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

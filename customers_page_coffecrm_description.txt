@@ -1,0 +1,104 @@
+# CoffeCRM Customers Page (customers/page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The "Клиенты" (Customers) page is the primary interface for managing the customer database. It allows staff to view a complete list of all registered customers, access their contact information, and get a high-level view of their value to the business through metrics like VIP status and total spending. The page serves as a launchpad for deeper dives into a customer's order history and bonus points, making it a cornerstone of customer relationship management within the application.
+
+## 2. Page Structure and Components
+
+The page is built on the standard application `Layout` and heavily utilizes Material-UI components to create a clean, data-driven interface.
+
+### 2.1. Header and Primary Actions
+
+-   **Title**: The page is titled "Клиенты" (Customers) with a subtitle explaining its purpose.
+-   **Action Buttons**:
+    -   **Обновить (Refresh)**: Allows for a manual reload of the customer list.
+    -   **Добавить клиента (Add Customer)**: A primary call-to-action that opens the `CustomerForm` modal to onboard a new customer. This action is protected by the `usePermissions` hook.
+
+### 2.2. KPI Summary Cards
+
+A grid of four `Paper` components provides an immediate statistical summary of the customer base:
+-   **Всего клиентов (Total Customers)**: A count of all customers in the system.
+-   **VIP клиентов (VIP Customers)**: The number of customers who have achieved VIP status.
+-   **Общая выручка (Total Revenue)**: The sum of total spending across all customers listed.
+-   **Всего бонусов (Total Bonuses)**: The sum of all accumulated, unspent bonus points across the customer base.
+
+### 2.3. Filter and Search Bar
+
+A `Paper` component houses the controls for refining the customer list:
+-   **Search Bar (`<TextField>`)**: A flexible search input to find customers by name, email, or phone number.
+-   **Status Filter (`<TextField select>`)**: A dropdown to filter customers by their status:
+    -   **Все** (All)
+    -   **VIP**
+    -   **Обычные** (Regular)
+
+### 2.4. Customer Table (`<CustomerTable>`)
+
+-   **Purpose**: The central element of the page, displaying the paginated list of customers.
+-   **Columns**: Includes key customer data points:
+    -   Name
+    -   Email
+    -   Phone
+    -   VIP Status (likely a visual `Chip`)
+    -   Total Spent
+    -   Bonus Points
+-   **Actions**: Each row features a set of actions:
+    -   **Edit**: Opens the `CustomerForm` to modify the customer's details.
+    -   **View History**: Navigates the user to a separate page dedicated to that customer's complete order history.
+    -   **View Bonuses**: Navigates to a page showing the customer's bonus point transactions.
+    -   **View**: A placeholder for viewing customer details, intended for future implementation.
+
+### 2.5. Customer Form (`<CustomerForm>`)
+
+-   **Purpose**: A modal dialog for creating a new customer or editing an existing one.
+-   **Fields**: Contains all necessary fields for a customer profile, such as:
+    -   First and Last Name
+    -   Email Address
+    -   Phone Number
+    -   Fields to manage VIP status or bonus points manually, if applicable.
+
+### 2.6. Pagination (`<TablePagination>`)
+
+Standard controls located below the table to navigate through the complete customer list, allowing users to move between pages and adjust the number of customers shown per page.
+
+## 3. Data Flow and State Management
+
+### 3.1. State
+
+-   `customers`: An array `Customer[]` to store the fetched customer data.
+-   `loading` & `error`: State for tracking API request status.
+-   `search` & `vipFilter`: State variables to hold the current filter criteria.
+-   `formOpen`: A boolean to toggle the `CustomerForm` modal.
+-   `selectedCustomer`: Stores the `Customer` object being edited.
+-   `page`, `rowsPerPage`, `total`: State for managing pagination.
+
+### 3.2. Data Fetching (`fetchCustomers`)
+
+-   **API Endpoint**: Fetches data from the `/customers` endpoint.
+-   **Parameters**: The request URL is built dynamically using `buildUrl` to include `search`, `vipStatus`, `page`, and `limit` as query parameters.
+-   **Triggers**: The `fetchCustomers` function is called within a `useEffect` hook that re-runs whenever any of its dependencies (`search`, `vipFilter`, `page`, `rowsPerPage`) change.
+-   **Authentication**: Requests are authenticated using `withAuthHeaders`.
+
+## 4. User Flows
+
+### 4.1. Searching for a Customer
+
+1.  User lands on the "Customers" page and sees the initial list.
+2.  User types a name, e.g., "John", into the search bar.
+3.  The state updates, triggering an API call to fetch only customers matching "John".
+4.  User then selects "VIP" from the status filter. The state updates again, and a new API call fetches only VIP customers matching "John".
+
+### 4.2. Adding a New Customer
+
+1.  User clicks "Добавить клиента".
+2.  The `CustomerForm` modal appears.
+3.  User fills out the form and clicks "Save".
+4.  The form submits the new customer data to the API.
+5.  On success, the modal closes, and the customer table is refreshed to include the new entry.
+
+### 4.3. Investigating a Customer's Activity
+
+1.  User locates a customer in the table.
+2.  User clicks the "Orders" button in the actions column for that customer.
+3.  The application navigates to a new page (`/customers/${customer.id}/orders`), displaying a detailed history of all orders placed by that specific customer.
+4.  Similarly, clicking "Bonuses" would navigate to the bonus history page.

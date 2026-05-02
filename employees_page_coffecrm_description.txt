@@ -1,0 +1,92 @@
+# CoffeCRM Employees Page (employees/page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The "Сотрудники" (Employees) page is the central human resources management hub within the CRM. It is designed for managers and administrators to maintain a comprehensive list of all staff members, manage their roles and permissions, and track their performance through Key Performance Indicators (KPIs). This section is vital for organizing staff, managing payroll information (implicitly), and evaluating performance.
+
+## 2. Page Structure and Components
+
+The page follows a standard administrative layout, featuring a filterable, paginated table and modals for creating and viewing data.
+
+### 2.1. Header and Primary Actions
+
+-   **Title**: "Список сотрудников" (Employee List).
+-   **Action Buttons**:
+    -   **Обновить (Refresh)**: Manually re-fetches the latest employee data.
+    -   **Добавить сотрудника (Add Employee)**: A permission-controlled button that opens the `EmployeeForm` modal to add a new staff member.
+
+### 2.2. Filter Bar
+
+A simple `Paper` component contains the primary means of finding employees:
+-   **Search Bar (`<TextField>`)**: Allows users to search for employees by criteria such as name or position. The logic also includes the ability to filter by `branchId`, though the UI control for this is not present in this specific file.
+
+### 2.3. Employee Table (`<EmployeeTable>`)
+
+-   **Purpose**: The main component for displaying the list of all employees.
+-   **Data**: The table is populated by the `employees` array from the component's state and is paginated.
+-   **Columns**: Likely includes essential employee information:
+    -   Name
+    -   Position / Role
+    -   Assigned Branch
+    -   Contact Information (Phone/Email)
+-   **Actions**: Each row provides a set of management actions:
+    -   **View KPI**: Opens the `EmployeeKPIDialog` to show performance metrics for that individual.
+    -   **Edit**: Opens the `EmployeeForm` with the selected employee's data for modification.
+    -   **Delete**: Initiates the process to remove an employee from the system.
+
+### 2.4. Modals
+
+The page utilizes two distinct modals for different functions:
+-   **EmployeeForm (`<EmployeeForm>`)**:
+    -   **Purpose**: A modal dialog for creating a new employee or editing an existing one.
+    -   **Fields**: Contains fields for an employee's personal details (name, contact info), job details (position, branch), and potentially their system access roles and permissions.
+-   **EmployeeKPIDialog (`<EmployeeKPIDialog>`)**:
+    -   **Purpose**: A specialized, read-only modal for displaying an employee's Key Performance Indicators.
+    -   **Content**: Would likely show charts and stats related to that employee's performance, such as total sales, average check size, number of orders processed, or customer satisfaction ratings.
+
+### 2.5. Pagination (`<TablePagination>`)
+
+Standard controls located below the table to navigate through the complete list of employees.
+
+## 3. Data Flow and State Management
+
+### 3.1. State
+
+-   `employees`: An array `Employee[]` to store the paginated list of employees.
+-   `loading` & `error`: For tracking API request status.
+-   `filters`: An object holding the `search` term and `branchId`.
+-   `formOpen` & `kpiDialogOpen`: Booleans to control the visibility of the two different modals.
+-   `selectedEmployee`: Stores the `Employee` object being edited or viewed.
+-   `page`, `rowsPerPage`, `total`: State variables for pagination.
+
+### 3.2. Data Fetching and Mutations
+
+-   **Fetch (`fetchEmployees`)**: Sends a GET request to the `/employees` endpoint. The request is built with `buildUrl` to include parameters for filtering (`search`, `branchId`) and pagination (`page`, `limit`). It's triggered by a `useEffect` hook that watches for changes in filters or pagination.
+-   **Delete (`handleDeleteEmployee`)**:
+    -   Uses a `window.confirm` dialog for user confirmation.
+    -   Sends a `DELETE` request to `/employees/${id}`.
+    -   Calls `fetchEmployees` on success to refresh the list.
+    -   Shows a browser `alert` on failure.
+-   **Create/Update**: Handled by the `EmployeeForm`. On a successful submission, its `onSuccess` callback is called, which then triggers `fetchEmployees`.
+
+## 4. User Flows
+
+### 4.1. Adding a New Hire
+
+1.  A manager clicks "Добавить сотрудника".
+2.  The `EmployeeForm` appears.
+3.  They fill in the new hire's name, contact details, select their role (e.g., "Barista"), and assign them to the "Main Street Cafe" branch.
+4.  After saving, the form closes, and the employee list refreshes, showing the new staff member.
+
+### 4.2. Reviewing Employee Performance
+
+1.  A manager wants to review the performance of a specific employee, Alice.
+2.  They use the search bar to find "Alice".
+3.  In the actions column for Alice's row, they click "View KPI".
+4.  The `EmployeeKPIDialog` modal appears, displaying charts and figures for Alice's sales, average order value, and hours worked for the current month.
+
+### 4.3. Terminating an Employee
+
+1.  An employee leaves the company. The administrator finds their record in the table and clicks "Delete".
+2.  A confirmation prompt appears: "Удалить сотрудника?".
+3.  The administrator clicks "OK". The employee record is removed from the system, and their access is implicitly revoked. The table refreshes to show the updated list.

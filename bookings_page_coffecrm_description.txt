@@ -1,0 +1,88 @@
+# CoffeCRM Bookings Page (bookings/page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The "Бронирования" (Bookings) page is a comprehensive module for managing all types of reservations, such as table bookings, event reservations, or meeting room appointments. It is designed to provide staff with a dual-perspective view of bookings—a traditional administrative list and a visual calendar—along with powerful filtering and status management capabilities. This page is central to organizing time-based services and managing venue capacity.
+
+## 2. Page Structure and Components
+
+The page features a sophisticated layout that allows users to switch between different views while maintaining a consistent set of filters and actions.
+
+### 2.1. Header and Primary Actions
+
+-   **Title**: "Бронирования" (Bookings).
+-   **Action Buttons**:
+    -   **Обновить (Refresh)**: Manually re-fetches the latest booking data.
+    -   **Создать бронирование (Create Booking)**: Opens the `BookingForm` modal to schedule a new booking. Access is controlled via the `usePermissions` hook.
+
+### 2.2. KPI Summary Cards
+
+A grid of four `Paper` components provides a quick statistical overview:
+-   **Всего бронирований (Total Bookings)**: Total count of bookings matching the current filters.
+-   **Ожидают (Pending)**: Number of bookings that are awaiting confirmation.
+-   **Подтверждено (Confirmed)**: Count of bookings that have been confirmed and are scheduled.
+-   **Выручка (Revenue)**: Total revenue from bookings that have been marked as `COMPLETED`.
+
+### 2.3. View and Filter Panel
+
+A large `Paper` component acts as the main control center for the page:
+-   **View Mode Tabs**:
+    -   **Таблица (Table)**: The default view, showing bookings in a paginated list (`BookingTable`).
+    -   **Календарь (Calendar)**: Switches to a visual calendar representation of bookings (`BookingCalendar`).
+-   **Filter Bar**: A comprehensive set of filters that apply to both Table and Calendar views:
+    -   **Status Filter**: Dropdown to filter by booking status (Pending, Confirmed, Completed, Canceled, No-Show).
+    -   **Type Filter**: Dropdown to filter by booking type (Table, Event, Meeting, etc.).
+    -   **Search Bar**: A text field to search for bookings by customer name, phone, or other details.
+    -   **Date Range Filters**: "С" (From) and "По" (To) date pickers to narrow the view to a specific timeframe.
+
+### 2.4. Main Content Area
+
+The content displayed in this area is conditional based on the selected `viewMode`.
+
+-   **Table View**:
+    -   **`<BookingTable>`**: Displays bookings with columns for Customer, Date & Time, Type, Status, and Price. The "Actions" column contains buttons to View Details, Edit, Confirm, or Cancel the booking.
+    -   **`<TablePagination>`**: Provides pagination for navigating through a large number of bookings.
+-   **Calendar View**:
+    -   **`<BookingCalendar>`**: Renders a visual calendar (e.g., weekly or monthly view) where bookings are displayed as events. This view is ideal for understanding scheduling and availability at a glance. Clicking on an event in the calendar likely opens the `BookingDetails` modal.
+
+### 2.5. Modals for Booking Management
+
+-   **BookingForm (`<BookingForm>`)**: A modal for creating or editing a booking. It includes fields for selecting a customer, setting the date, start/end times, number of guests, booking type, and any associated price or notes.
+-   **BookingDetails (`<BookingDetails>`)**: A read-only modal that shows a complete summary of a selected booking. Crucially, this modal also contains action buttons (e.g., "Confirm", "Cancel", "Complete") that allow staff to advance the booking through its lifecycle.
+
+## 3. Data Flow and Lifecycle Management
+
+### 3.1. State
+
+-   The component maintains a rich state, including `bookings`, `loading`, `error`, pagination state (`page`, `rowsPerPage`, `total`), modal visibility (`formOpen`, `detailsOpen`), the selected `viewMode`, and a `filters` object with multiple properties.
+
+### 3.2. Data Fetching (`fetchBookings`)
+
+-   **API Endpoint**: Fetches data from `/bookings`.
+-   **Parameters**: The `buildUrl` function assembles a URL with query parameters based on all the active `filters` and pagination state.
+-   **Triggers**: `fetchBookings` is called from a `useEffect` hook that listens for changes in `filters`, `page`, or `rowsPerPage`, ensuring the view is always up-to-date.
+
+### 3.3. Booking Lifecycle Management
+
+The component includes several handler functions that interact with the API to change a booking's status:
+-   `handleConfirmBooking`: Sends a PUT request to `/bookings/${id}/confirm`.
+-   `handleCancelBooking`: Prompts the user for a reason and sends a PUT request to `/bookings/${id}/cancel`.
+-   `handleCompleteBooking`: Sends a PUT request to `/bookings/${id}/complete`.
+-   These functions ensure that all status changes are recorded on the backend and immediately reflected in the UI by re-fetching the booking list.
+
+## 4. User Flows
+
+### 4.1. Creating and Confirming a Booking
+
+1.  A staff member clicks "Создать бронирование".
+2.  The `BookingForm` appears. They fill in the customer details, desired date/time for a table. The booking is created with a `PENDING` status.
+3.  Later, a manager reviews the pending bookings in the table. They click "View" on the new booking.
+4.  The `BookingDetails` modal opens. The manager verifies the details and clicks the "Confirm" button within the modal.
+5.  An API call is made, the booking status is updated to `CONFIRMED`, and the change is reflected in the table (e.g., the status chip turns green).
+
+### 4.2. Using the Calendar View
+
+1.  A user switches to the "Календарь" view to check availability for the upcoming week.
+2.  They see the week laid out, with colored blocks representing confirmed bookings.
+3.  They click on an existing booking block in the calendar.
+4.  The `BookingDetails` modal pops up, showing the information for that specific booking.

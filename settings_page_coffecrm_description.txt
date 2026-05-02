@@ -1,0 +1,64 @@
+# CoffeCRM Settings Page (settings/page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The "Настройки" (Settings) page is the central configuration hub for the entire CoffeCRM application. It is designed for administrators to manage core business information, configure payment processing, and set up third-party integrations. The page uses a tabbed layout to neatly organize these distinct areas of configuration. Access to this entire section is protected by a permissions check.
+
+## 2. Page Structure and Components
+
+The page's primary role is to act as a container and router for more specific settings components.
+
+-   **Layout (`<Layout>`)**: The page is wrapped in the standard application layout, providing consistent navigation.
+-   **Main Panel (`<Paper>`)**: A single `Paper` component contains the entire settings interface.
+-   **Tabs (`<Tabs>`)**: The core navigational element of the page. It allows users to switch between different settings panels without leaving the page. The three tabs are:
+    1.  **"Компания" (Company)**
+    2.  **"Платежи" (Payments)**
+    3.  **"Интеграции" (Integrations)**
+-   **Tab Content**: The area below the tabs conditionally renders one of the three child components based on the currently active `tab` state.
+
+## 3. Child Component Breakdown
+
+While the code for the child components is not in this file, their purpose can be inferred from their names and the overall context of a CRM.
+
+### 3.1. Company Settings (`<CompanySettings />`) - Tab 0
+
+-   **Purpose**: To manage the primary details of the business entity.
+-   **Likely Fields**:
+    -   Company Name
+    -   Legal Name / Tax ID
+    -   Primary Address
+    -   Contact Information (Phone, Email)
+    -   Business Logo/Branding options
+    -   Default currency and timezone.
+
+### 3.2. Payment Settings (`<PaymentSettings />`) - Tab 1
+
+-   **Purpose**: To configure how the application processes payments.
+-   **Likely Fields**:
+    -   **Payment Gateway Configuration**: API keys and credentials for services like Stripe, PayPal, or a regional equivalent.
+    -   **Accepted Payment Methods**: Checkboxes to enable or disable payment methods (e.g., Cash, Card, Online).
+    -   **Tax Settings**: Default tax rates and rules.
+
+### 3.3. Integration Settings (`<IntegrationSettings />`) - Tab 2
+
+-   **Purpose**: To connect the CRM with external, third-party services.
+-   **Likely Fields**: This section would contain sub-sections for different types of integrations:
+    -   **SMS Gateway**: API keys for sending SMS notifications to customers.
+    -   **Email Marketing**: API keys for services like Mailchimp or SendGrid.
+    -   **Accounting Software**: Configuration to export sales data to platforms like QuickBooks or Xero.
+    -   **Delivery Services**: API keys to integrate with local food delivery platforms.
+
+## 4. Permissions and State Management
+
+-   **Permissions (`usePermissions`)**: The entire page is protected by the `usePermissions` hook. Before rendering the settings tabs, it checks if the user `canEditResource`. If the check fails, it renders a simple "access denied" message, effectively locking down all application settings from unauthorized users.
+    -   *Note*: The code contains a developer comment `// ← ДОСТАВАЙ isLoading!` suggesting that the permission check might be asynchronous and could be improved by handling a loading state to prevent showing the "access denied" message momentarily while permissions are still being fetched.
+-   **State (`useState`)**: The only state managed by this parent component is `const [tab, setTab] = useState(0);`, which simply keeps track of which tab is currently selected. The actual state for each settings panel is managed within its respective child component.
+
+## 5. User Flow
+
+1.  An administrator navigates to the "Settings" page. The application verifies they have the necessary permissions.
+2.  The page loads, displaying the "Company" tab by default. The `CompanySettings` component is rendered, showing the current business name and address.
+3.  The administrator needs to update the payment gateway API key. They click on the **"Платежи" (Payments)** tab.
+4.  The `tab` state updates, and the `PaymentSettings` component is rendered in its place.
+5.  The administrator updates the API key in the corresponding field and clicks a "Save" button within that component.
+6.  The `PaymentSettings` component handles the API call to save the updated settings.

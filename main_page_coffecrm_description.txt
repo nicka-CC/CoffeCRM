@@ -1,0 +1,104 @@
+# CoffeCRM Dashboard Page (page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The Dashboard is the main landing page for authenticated users of the CoffeCRM application. It serves as a centralized "mission control" that provides a real-time, high-level overview of key business metrics and activities. Its primary goal is to give business owners and managers a quick, digestible snapshot of the company's performance without needing to delve into detailed reports. The page focuses on data visualization to make trends and important figures immediately apparent.
+
+## 2. Page Structure and Components
+
+The page is built using a modern frontend stack, with React and Next.js for the structure and Material-UI (`@mui/material`) for the user interface components. Data visualizations are rendered using the `recharts` library.
+
+### 2.1. Layout (`Layout.tsx`)
+
+The entire page is wrapped in a `Layout` component. This component provides the consistent frame for the application, which includes:
+-   **A persistent sidebar menu** for navigation to other key sections of the application (e.g., Orders, Products, Customers).
+-   **A top app bar** which likely contains the page title, user profile information, and notifications.
+-   The main content area where the dashboard itself is rendered.
+
+### 2.2. Main Content Area (`<Box sx={{ p: 3 }}>`)
+
+The dashboard content is organized within a main container with padding for spacing.
+
+#### 2.2.1. Header and Period Selector
+
+-   **Title**: A "Статистика" (Statistics) heading clearly marks the beginning of the main content.
+-   **Period Selector**: A dropdown menu (`<Select>`) on the top-right allows the user to filter the data displayed on the dashboard by a specific time period:
+    -   **День** (Day)
+    -   **Неделя** (Week)
+    -   **Месяц** (Month)
+    Changing the selection triggers a new data fetch for the entire dashboard.
+
+### 2.3. Key Performance Indicator (KPI) Cards
+
+This is a prominent section near the top of the page, designed to show the most important metrics at a glance. It consists of a grid of four `Paper` components, each styled with a distinct background color to visually separate them.
+
+-   **Выручка (Revenue)**: Displays the total revenue for the selected period. The value is formatted as a currency.
+-   **Заказов (Orders)**: Shows the total number of orders placed within the period.
+-   **Средний чек (Average Check)**: Presents the average value of each order, also formatted as a currency.
+-   **Новых клиентов (New Customers)**: Indicates the number of new customers acquired during the selected period.
+
+### 2.4. Data Visualization Charts
+
+This section uses charts to provide a more detailed, visual representation of business performance.
+
+#### 2.4.1. График продаж (Sales Chart)
+
+-   **Component**: A responsive line chart (`<LineChart>`) from the `recharts` library, placed within a `Paper` component.
+-   **Purpose**: To visualize sales trends over the selected period.
+-   **Data Series**: It plots two distinct lines:
+    1.  **Revenue (`revenue`)**: A line showing the revenue trend over time.
+    2.  **Orders (`orders`)**: A line showing the trend in the number of orders.
+-   **Features**:
+    -   **X-Axis**: Represents the time intervals (e.g., hours of the day, days of the week).
+    -   **Y-Axis**: Represents the value (currency for revenue, count for orders).
+    -   **Tooltip**: Hovering over a data point on the chart reveals a tooltip with the exact values for that point in time.
+    -   **Legend**: Clearly labels which line corresponds to "Выручка" and "Заказы".
+    -   **Grid**: A cartesian grid helps in reading the chart values.
+
+#### 2.4.2. ТОП товаров (Top Products)
+
+-   **Component**: A vertical stack (`<Stack>`) of items within a `Paper` component.
+-   **Purpose**: To list the best-selling products for the selected period, allowing managers to quickly identify popular items.
+-   **Display**: Each product in the list is displayed with:
+    -   A numbered `Avatar` indicating its rank (1, 2, 3, etc.).
+    -   The product's **name**.
+    -   Key metrics: total **quantity sold** and total **revenue generated** by that product.
+
+## 3. Data Flow and State Management
+
+### 3.1. State
+
+The component manages its state using React's `useState` hook:
+-   `period`: Stores the currently selected time period ('day', 'week', 'month').
+-   `loading`: A boolean that tracks whether the component is currently fetching data.
+-   `error`: Stores any error message if the API call fails.
+-   `dashboardData`: An object that holds all the data returned from the API.
+
+### 3.2. Data Fetching (`fetchDashboard`)
+
+-   **Trigger**: The `fetchDashboard` function is called whenever the `period` state changes, thanks to a `useEffect` hook.
+-   **API Call**: It makes an asynchronous `fetch` request to the `${API_BASE_URL}/dashboard?period=${period}` endpoint.
+-   **Authentication**: The request includes authentication headers by using the `withAuthHeaders()` utility, ensuring that only logged-in users can access the data.
+-   **Response Handling**:
+    -   On a successful response, the JSON data is parsed and stored in the `dashboardData` state.
+    -   If the response is not `ok`, it throws an error.
+-   **Loading/Error UI**:
+    -   While `loading` is `true`, the component displays a `CircularProgress` indicator.
+    -   If `error` is not null or `dashboardData` is missing after the fetch attempt, an `Alert` component is shown with the error message.
+
+## 4. User Interaction and Navigation
+
+### 4.1. Quick Actions (`handleQuickAction`)
+
+-   The component includes a function `handleQuickAction` which is intended to be called by UI elements (not present in the provided code, but likely buttons or links).
+-   This function uses Next.js's `useRouter` to programmatically navigate the user to different pages for creating new entities (e.g., a new order, a new product). This provides helpful shortcuts for common tasks directly from the dashboard.
+
+## 5. Code and Dependencies
+
+-   **Framework**: Next.js (React)
+-   **UI Library**: Material-UI (`@mui/material`)
+-   **Charting Library**: `recharts`
+-   **Authentication**: Assumes a JWT-based or similar authentication mechanism handled by `withAuthHeaders`.
+-   **Utilities**:
+    -   `formatCurrency`: A utility function to format numbers into a currency string.
+    -   `API_BASE_URL`: A constant for the base URL of the backend API.

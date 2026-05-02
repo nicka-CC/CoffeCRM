@@ -1,0 +1,108 @@
+# CoffeCRM Products Page (products/page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The "Товары и меню" (Products and Menu) page is a critical administrative section of the CoffeCRM application. Its primary function is to provide a centralized interface for managing the entire product catalog. This includes both finished goods that are sold to customers (e.g., Espresso, Latte) and the raw ingredients used to produce them (e.g., Coffee Beans, Milk). Users can create, view, update, and delete products, manage pricing, and categorize items.
+
+## 2. Page Structure and Components
+
+The page is built with React/Next.js and uses Material-UI for its component library. It is wrapped in the standard application `Layout` component, providing consistent navigation and branding.
+
+### 2.1. Header and Controls
+
+-   **Title**: The page has a main title "Список товаров" (Product List).
+-   **Control Bar**: Located at the top of the content area, this bar contains key actions:
+    -   **Filter (`<Select>`)**: A dropdown menu labeled "Фильтр" that allows users to narrow down the product list based on type:
+        -   **Все** (All): Shows all items.
+        -   **Только готовые** (Finished Products Only): Displays only items that are not marked as ingredients.
+        -   **Только ингредиенты** (Ingredients Only): Displays only items that are marked as ingredients.
+    -   **Add Product Button (`<Button>`)**: A "Добавить товар" button with a plus icon. Clicking this opens the `ProductForm` modal to add a new item to the catalog. Access to this button is controlled by the `usePermissions` hook, ensuring only authorized users can create products.
+
+### 2.2. Product Table (`<ProductTable>`)
+
+-   **Purpose**: This is the core component of the page, displaying the list of products in a tabular format.
+-   **Columns**: The table is expected to have columns such as:
+    -   **Name**: The name of the product or ingredient.
+    -   **Category**: The category the item belongs to.
+    -   **Price**: The selling price or cost price.
+    -   **SKU**: The Stock Keeping Unit or internal identifier.
+    -   **Type**: Whether the item is a "Finished Product" or an "Ingredient".
+    -   **Actions**: A set of buttons for each row, typically including:
+        -   **Edit**: Opens the `ProductForm` with the data for the selected product, allowing for modifications.
+        -   **Delete**: A button to remove the product from the catalog (this would likely trigger a confirmation dialog).
+-   **Data Source**: The table receives the `products` array from the main page's state.
+
+### 2.3. Pagination (`<TablePagination>`)
+
+-   Located below the product table, this component handles navigation for large product lists.
+-   **Features**:
+    -   It shows the current range of items being displayed (e.g., "1-20 of 100").
+    -   Allows the user to jump to the next or previous page.
+    -   Provides a dropdown to change the number of **rows per page** (e.g., 10, 20, 50, 100).
+
+### 2.4. Product Form (`<ProductForm>`)
+
+-   **Purpose**: A modal dialog or separate view used for both creating new products and editing existing ones. It opens when the "Add Product" button is clicked or an "Edit" action is triggered from the table.
+-   **Fields**: The form contains input fields for all product attributes, such as:
+    -   Name
+    -   Category (likely a dropdown)
+    -   Price
+    -   SKU
+    -   A checkbox or toggle to mark the item as an ingredient.
+    -   Other potential fields like description, stock levels, etc.
+-   **Actions**:
+    -   **Save/Submit**: Saves the new or updated product data to the backend.
+    -   **Cancel**: Closes the form without saving changes.
+
+## 3. Data Flow and State Management
+
+### 3.1. State
+
+The `ProductsPage` component manages the following state variables:
+-   `products`: An array `ProductListItem[]` holding the product data for the current page.
+-   `loading`: A boolean to indicate when data is being fetched.
+-   `error`: A string to hold any error messages from API calls.
+-   `formOpen`: A boolean that controls the visibility of the `ProductForm`.
+-   `selectedProduct`: Holds the data of the product being edited, or `null` when creating a new one.
+-   `filterMode`: Stores the current filter selection ('all', 'ingredients', 'products').
+-   `page`: The current page number for pagination.
+-   `rowsPerPage`: The number of items to display per page.
+-   `total`: The total number of products in the database that match the current filter.
+
+### 3.2. Data Fetching (`fetchProducts`)
+
+-   **API Endpoint**: Fetches data from `${API_BASE_URL}/products`.
+-   **Parameters**: The request is parameterized with `page`, `limit`, and `isIngredient` (based on the `filterMode`) to support pagination and filtering.
+-   **Triggers**: `fetchProducts` is called by `useEffect` hooks when:
+    -   The component first mounts.
+    -   The `page` number changes.
+    -   The `filterMode` or `rowsPerPage` settings are changed.
+-   **Authentication**: Uses `withAuthHeaders()` to include necessary authentication tokens in the request.
+-   **Response**: The API is expected to return an object containing the paginated `data` array and the `total` count of items.
+
+## 4. User Flows
+
+### 4.1. Viewing Products
+
+1.  User navigates to the "Products and Menu" page.
+2.  The component fetches and displays the first page of all products.
+3.  User can use the filter dropdown to view only finished products or ingredients.
+4.  User can use the pagination controls to navigate through the list.
+
+### 4.2. Creating a New Product
+
+1.  User clicks the "Добавить товар" (Add Product) button.
+2.  The `ProductForm` modal appears with empty fields.
+3.  User fills in the product details.
+4.  User clicks "Save".
+5.  The form submits the data to the backend API.
+6.  On success, the form closes, and the main product list is refreshed to show the newly added item.
+
+### 4.3. Editing an Existing Product
+
+1.  User finds a product in the table and clicks its "Edit" button.
+2.  The `ProductForm` modal appears, pre-populated with that product's data.
+3.  User modifies the details.
+4.  User clicks "Save".
+5.  The form submits the updated data.
+6.  On success, the form closes, and the product list is refreshed to show the updated information.

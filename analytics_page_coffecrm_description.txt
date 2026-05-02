@@ -1,0 +1,88 @@
+# CoffeCRM Analytics Page (analytics/page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The "Аналитика" (Analytics) page provides a powerful suite of tools for in-depth business intelligence and performance analysis. While the main Dashboard offers a high-level snapshot, the Analytics page allows users to explore trends over longer periods, compare performance across different segments (customers, branches), and export detailed reports for offline analysis. It is designed for managers and business owners who need to make data-driven decisions.
+
+## 2. Page Structure and Components
+
+The page is composed of a control bar for filtering and actions, followed by a grid of data visualization widgets. It uses the `recharts` library for charting and Material-UI for layout and controls.
+
+### 2.1. Header and Controls
+
+-   **Title**: "Аналитика".
+-   **Action Buttons**:
+    -   **Обновить (Refresh)**: Manually triggers a re-fetch of all analytics data.
+    -   **Экспорт отчета (Export Report)**: A multi-functional dropdown button that allows users to download various datasets in different formats. This is a key feature of the page.
+-   **Filter Bar**: A `Paper` component containing controls to define the time period for the analysis:
+    -   **Period Selector**: A dropdown to choose a preset range: "Неделя" (Week), "Месяц" (Month), "Квартал" (Quarter).
+    -   **Custom Range**: If "Произвольный" (Custom) is selected, two `TextField` date pickers ("С" - From, "По" - To) appear, allowing the user to define a specific date range.
+
+### 2.2. Export Functionality
+
+-   The export feature is consolidated into a single dropdown menu to save space.
+-   Users can export data for:
+    -   Sales
+    -   Branches
+    -   Top Products
+    -   Top Customers
+-   Each dataset can be exported in two formats:
+    -   **Excel (.xlsx)**
+    -   **PDF (.pdf)**
+-   The downloads are handled by a dedicated `/analytics/export` API endpoint, and the frontend code dynamically generates a descriptive filename for the downloaded report (e.g., `отчет-продажи-16-03-2026-10-30.xlsx`).
+
+## 3. Data Visualization Grid
+
+The core of the page is a 2x2 grid of `Paper` components, each containing a specific chart.
+
+### 3.1. Динамика продаж (Sales Dynamics)
+
+-   **Chart Type**: A dual-axis `LineChart`.
+-   **Purpose**: To show the relationship and trends between the number of orders and the revenue generated over the selected period.
+-   **Features**:
+    -   **Dual Y-Axes**: Uses two Y-axes (left for order count, right for revenue) to plot two different data series with different scales on the same chart.
+    -   **Data Series**:
+        -   "Количество заказов" (Number of Orders)
+        -   "Выручка" (Revenue)
+    -   **Tooltip**: A rich tooltip provides the exact values for both series at any given point on the chart.
+
+### 3.2. ТОП клиентов (Top Customers)
+
+-   **Chart Type**: A horizontal `BarChart`.
+-   **Purpose**: To identify the most valuable customers by the total revenue they have generated.
+-   **Features**:
+    -   **Layout**: `layout="vertical"` makes the bars run horizontally, which is ideal for long labels (customer names).
+    -   **Data**: Each bar represents a customer, and its length corresponds to their total revenue.
+    -   **Tooltip**: Shows the exact revenue and order count for each customer when hovered over.
+
+### 3.3. Продажи по филиалам (Branch Sales)
+
+-   **Chart Type**: A `PieChart`, rendered as a Donut Chart (due to `innerRadius`).
+-   **Purpose**: To visualize the sales performance distribution across different business locations/branches.
+-   **Features**:
+    -   **Data**: Each slice of the pie represents a branch, with its size proportional to its share of the total revenue.
+    -   **Labels**: Labels are drawn directly on the chart, showing the branch name and its percentage contribution.
+    -   **Legend**: An interactive legend on the side provides a clear key for the chart.
+
+### 3.4. Пиковые часы заказов (Peak Hours)
+
+-   **Chart Type**: A `BarChart`.
+-   **Purpose**: To identify the busiest times of day in terms of order volume, helping with decisions about staffing and promotions.
+-   **Features**:
+    -   **Data**: The X-axis represents every hour of the day (0:00 to 23:00). The height of the bar for each hour shows the total number of orders placed during that hour.
+    -   **Conditional Coloring**: The bars are colored differently to visually distinguish "peak" hours from "off-peak" hours, making trends instantly recognizable.
+
+## 4. Data Flow and State
+
+-   **State**: The component manages state for `period`, `from`, `to` dates, `loading`, `error`, and the main `analyticsData` object.
+-   **Data Fetching**: A single API call to `/analytics` is made when the component mounts or when the date filters are changed. This endpoint returns a large JSON object containing all the necessary data for all the charts (`salesDynamics`, `topProducts`, etc.). This is efficient as it avoids multiple separate API calls.
+
+## 5. User Flow Example
+
+1.  User navigates to the "Analytics" page. Data for the default period ("Month") is loaded.
+2.  The user examines the "Branch Sales" chart and sees that one branch is underperforming.
+3.  The user wants to create a formal report. They click the "Export Report" button.
+4.  From the dropdown, they select "Отчет по филиалам (PDF)".
+5.  The browser initiates a download for a file named `отчет-филиалы-[current-date].pdf`, containing the branch sales data.
+6.  Next, the user wants to analyze the last quarter. They change the "Period" dropdown to "Квартал".
+7.  The `period` state changes, triggering the `fetchAnalytics` function. All charts on the page update simultaneously to reflect the data for the last quarter.

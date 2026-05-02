@@ -1,0 +1,85 @@
+# CoffeCRM Inventory Page (inventory/page.tsx) - Detailed Description
+
+## 1. Overall Purpose
+
+The "Склад" (Inventory) page is a critical operational dashboard for managing the stock of ingredients and supplies across all branches. Its primary goal is to provide a real-time, centralized view of inventory levels, track the movement of goods, and proactively alert managers about items that are running low. This helps prevent stockouts, optimize purchasing, and reduce waste.
+
+## 2. Page Structure and Components
+
+The page is designed as a two-column dashboard, prioritizing the most important information.
+
+### 2.1. Header and Summary Chips
+
+-   **Title**: "Склад" (Inventory).
+-   **Summary Chips**: A row of `Chip` components at the top provides a high-level summary of the entire inventory:
+    -   **Total Stock**: The sum of all units of all items across all locations.
+    -   **Estimated Value**: The total monetary value of all stock.
+    -   **Reserved**: The quantity of items reserved for open orders or other commitments.
+    -   **Low Stock**: A count of the number of unique items that have fallen below their defined minimum quantity threshold.
+-   **Refresh Button**: Allows for a manual reload of all inventory data.
+
+### 2.2. Main Content Layout
+
+The page is divided into two main columns: a large table for detailed overview and a smaller side panel for urgent alerts.
+
+#### 2.2.1. Ingredient Stock Table (Left Column)
+
+-   **Purpose**: This is the core of the page, a detailed table listing every stock item at every branch.
+-   **Expandable Rows**: A key feature is that each row is expandable. Clicking an expand icon reveals a nested sub-table showing the **"Последние операции" (Recent Transactions)** for that specific item, providing a quick audit trail of its movement.
+-   **Columns**:
+    -   **Product**: Name, SKU, and image of the inventory item.
+    -   **Branch**: The branch where the item is located, including its city and specific storage location (if any).
+    -   **Quantity**: Total quantity on hand, with reserved amount shown separately.
+    -   **Available**: The actual available quantity (Total - Reserved). This value is colored red if it's below the minimum threshold.
+    -   **Value**: The estimated monetary value of the stock for that item.
+    -   **Status**: A `Chip` indicating if the stock level is "Норма" (Normal) or "Низкий остаток" (Low Stock).
+    -   **Actions**: An icon button to "Зарегистрировать движение" (Register Transaction), which opens the `InventoryTransactionDialog`.
+-   **Pagination**: The table is paginated to handle a large number of stock items.
+
+#### 2.2.2. Low Stock Alerts Panel (Right Column)
+
+-   **Purpose**: This panel acts as a dedicated, high-priority "to-do" list for inventory managers. It isolates only the items that require immediate attention.
+-   **Layout**: It contains a series of `Card` components, one for each low-stock alert.
+-   **Alert Card**: Each card provides a concise summary of the issue:
+    -   Product name and image.
+    -   Branch name and manager contact info.
+    -   A clear display of the `Remaining` quantity vs. the `Threshold`.
+
+### 2.3. Inventory Transaction Dialog (`<InventoryTransactionDialog>`)
+
+-   **Purpose**: A modal form for recording any change in stock quantity. This is the primary mechanism for keeping inventory data accurate.
+-   **Transaction Types**: The dialog allows users to register different types of movements:
+    -   **INCOME**: Receiving a new shipment from a supplier.
+    -   **EXPENSE**: Using ingredients for production.
+    -   **WRITEOFF**: Discarding expired or damaged goods.
+-   **Fields**: Contains fields for transaction `type`, `quantity`, `price` (for cost tracking), `reason`, and an associated `document` number.
+
+## 3. Data Flow and State Management
+
+-   **Parallel Fetching**: The `fetchData` function uses `Promise.all` to make two simultaneous API calls: one for the main stock overview and one specifically for the low stock alerts. This improves page load performance.
+-   **State**: The component manages several pieces of state:
+    -   `overview`: The main array of stock items for the table.
+    -   `alerts`: A separate array for the items in the low-stock panel.
+    -   `dialogOpen` & `selectedStock`: To control the transaction dialog.
+    -   `expandedRows`: An object that keeps track of which rows in the table are currently expanded (e.g., `{ 'stock-item-id-123': true }`).
+    -   Pagination state (`page`, `rowsPerPage`, `total`).
+-   **Memoized Calculations**: `useMemo` is used to efficiently calculate the summary chip values (`totalValue`, `totalQuantity`, etc.) only when the `overview` data changes.
+
+## 4. User Flows
+
+### 4.1. Daily Inventory Check
+
+1.  A manager opens the "Inventory" page.
+2.  They first glance at the "Low Stock Alerts" panel on the right. They see that "Coffee Beans" at "Main Street Cafe" are low.
+3.  They then find the "Coffee Beans" item for that branch in the main table on the left. The row is highlighted yellow to indicate low stock.
+4.  They click the expand icon on that row. The recent transactions sub-table appears, showing that a large amount was used yesterday.
+5.  This prompts them to place a new order with their supplier.
+
+### 4.2. Receiving a New Shipment
+
+1.  A shipment of milk arrives at a branch.
+2.  The manager finds "Milk" for their branch in the inventory table.
+3.  They click the "Register Transaction" icon button in the actions column.
+4.  The `InventoryTransactionDialog` opens.
+5.  They select the `INCOME` type, enter the quantity received (e.g., 20 liters), the price per liter from the invoice, and the invoice number in the "Document" field.
+6.  Upon saving, the `fetchData` function is called, and the table updates to show the new, higher quantity of milk. The "Low Stock" status, if it was active, now changes back to "Normal".

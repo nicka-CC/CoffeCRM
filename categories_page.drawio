@@ -1,0 +1,94 @@
+<mxfile host="app.diagrams.net" modified="2026-03-16T12:05:00.000Z" agent="Gemini" etag="V_gmz-ODg5Njc2NTQzMjEw" version="21.7.5" type="device">
+  <diagram name="Страница Категорий" id="categories-page-diagram">
+    <mxGraphModel dx="1434" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" value="Страница &quot;Категории&quot; (/categories)" style="swimlane;startSize=23;fontStyle=1;fontSize=14;" vertex="1">
+          <mxGeometry x="20" y="20" width="1000" height="700" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="2" value="Layout (Header, Sidebar)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1" vertex="1">
+          <mxGeometry x="10" y="30" width="980" height="660" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="3" value="Заголовок: &quot;Категории товаров&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1">
+          <mxGeometry x="20" y="10" width="400" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="3" value="Основной контент" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;" vertex="1">
+          <mxGeometry x="20" y="60" width="940" height="580" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="5" value="Панель действий" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8f9fa;dashed=1;" vertex="1">
+          <mxGeometry y="10" width="940" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="6" value="Кнопка &quot;Обновить&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1e1e1;" vertex="1">
+          <mxGeometry x="650" y="10" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="6" value="Кнопка &quot;Добавить категорию&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1">
+          <mxGeometry x="780" y="10" width="150" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="9" parent="5" value="&lt;b&gt;CategoryTable.tsx&lt;/b&gt;" style="swimlane;startSize=20;fontStyle=1;fontSize=12;" vertex="1">
+          <mxGeometry y="80" width="940" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="10" parent="9" value="Заголовок таблицы (Иконка, Название, Дата, Действия)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dee2e6;" vertex="1">
+          <mxGeometry y="20" width="940" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="11" parent="9" value="Строка категории" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1">
+          <mxGeometry y="70" width="940" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="12" parent="11" value="Avatar (иконка)" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;" vertex="1">
+          <mxGeometry x="20" y="5" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="11" value="Название категории" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1">
+          <mxGeometry x="80" y="15" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="14" parent="11" value="Дата создания" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1">
+          <mxGeometry x="400" y="15" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="15" parent="11" value="Кнопка &quot;Редактировать&quot;" style="shape=image;image=https://cdn-icons-png.flaticon.com/512/1159/1159633.png;aspect=fixed;" vertex="1">
+          <mxGeometry x="850" y="12.5" width="25" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="16" parent="11" value="Кнопка &quot;Удалить&quot;" style="shape=image;image=https://cdn-icons-png.flaticon.com/512/3096/3096673.png;aspect=fixed;" vertex="1">
+          <mxGeometry x="890" y="12.5" width="25" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="17" parent="9" value="Строка категории 2" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1">
+          <mxGeometry y="130" width="940" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="18" parent="2" value="&lt;b&gt;CategoryForm.tsx&lt;/b&gt;&lt;br&gt;(Модальное окно)" style="swimlane;startSize=23;fontStyle=1;fontSize=12;" vertex="1">
+          <mxGeometry x="300" y="120" width="400" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="19" parent="18" value="Заголовок: &quot;Добавить/Редактировать категорию&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1">
+          <mxGeometry y="30" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="20" parent="18" value="Поле: Название категории" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="20" y="70" width="360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="21" parent="18" value="Поле: URL иконки" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="20" y="120" width="360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="22" parent="18" value="Предпросмотр иконки" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;align=left;paddingLeft=10;" vertex="1">
+          <mxGeometry x="20" y="170" width="360" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="23" parent="22" value="Avatar" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;" vertex="1">
+          <mxGeometry x="20" y="10" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="24" parent="18" value="Кнопка &quot;Отмена&quot;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="170" y="290" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="25" parent="18" value="Кнопка &quot;Сохранить&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1">
+          <mxGeometry x="280" y="290" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="8" target="18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="15" target="18">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="862" y="115" />
+              <mxPoint x="700" y="115" />
+              <mxPoint x="700" y="295" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

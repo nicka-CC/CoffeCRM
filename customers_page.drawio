@@ -1,0 +1,121 @@
+<mxfile host="app.diagrams.net" modified="2026-03-16T12:10:00.000Z" agent="Gemini" etag="W_gmz-ODg5Njc2NTQzMjEw" version="21.7.5" type="device">
+  <diagram name="Страница Клиентов" id="customers-page-diagram">
+    <mxGraphModel dx="1434" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" value="Страница &quot;Клиенты&quot; (/customers)" style="swimlane;startSize=23;fontStyle=1;fontSize=14;" vertex="1">
+          <mxGeometry x="20" y="20" width="1130" height="780" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="2" value="Layout" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1" vertex="1">
+          <mxGeometry x="10" y="30" width="1110" height="740" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="3" value="Панель действий" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1">
+          <mxGeometry x="20" y="20" width="1070" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="4" value="Заголовок: &quot;Клиенты&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1">
+          <mxGeometry x="10" y="15" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="4" value="Кнопка &quot;Обновить&quot;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="800" y="10" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="4" value="Кнопка &quot;Добавить клиента&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1">
+          <mxGeometry x="930" y="10" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="3" value="Сводная статистика" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1">
+          <mxGeometry x="20" y="80" width="1070" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="9" parent="8" value="Всего клиентов" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f9ff;" vertex="1">
+          <mxGeometry x="20" y="15" width="240" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="10" parent="8" value="VIP клиентов" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3cd;" vertex="1">
+          <mxGeometry x="280" y="15" width="240" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="11" parent="8" value="Общая выручка" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1fae5;" vertex="1">
+          <mxGeometry x="540" y="15" width="240" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="12" parent="8" value="Всего бонусов" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0e7ff;" vertex="1">
+          <mxGeometry x="800" y="15" width="240" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="3" value="Фильтры и поиск" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1">
+          <mxGeometry x="20" y="170" width="1070" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="14" parent="13" value="Поле Поиска" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="20" y="15" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="15" parent="13" value="Фильтр по статусу (VIP)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="340" y="15" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="16" parent="3" value="&lt;b&gt;CustomerTable.tsx&lt;/b&gt;" style="swimlane;startSize=20;fontStyle=1;fontSize=12;" vertex="1">
+          <mxGeometry x="20" y="240" width="1070" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="17" parent="16" value="Заголовок таблицы" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dee2e6;" vertex="1">
+          <mxGeometry y="20" width="1070" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="18" parent="16" value="Строка клиента" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1">
+          <mxGeometry y="70" width="1070" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="19" parent="18" value="Клиент (Avatar, ФИО, email)" style="text;html=1;align=left;" vertex="1">
+          <mxGeometry x="20" y="10" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="20" parent="18" value="Статус (VIP, Скидка)" style="text;html=1;align=left;" vertex="1">
+          <mxGeometry x="240" y="10" width="150" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="21" parent="18" value="Заказы" style="text;html=1;align=center;" vertex="1">
+          <mxGeometry x="410" y="10" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="22" parent="18" value="Потрачено" style="text;html=1;align=center;" vertex="1">
+          <mxGeometry x="510" y="10" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="23" parent="18" value="Сред. чек" style="text;html=1;align=center;" vertex="1">
+          <mxGeometry x="630" y="10" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="24" parent="18" value="Бонусы" style="text;html=1;align=center;" vertex="1">
+          <mxGeometry x="750" y="10" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="25" parent="18" value="Действия" style="text;html=1;align=center;" vertex="1">
+          <mxGeometry x="870" y="10" width="180" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="26" parent="3" value="Пагинация" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="790" y="550" width="300" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="27" parent="2" value="&lt;b&gt;CustomerForm.tsx&lt;/b&gt;&lt;br&gt;(Модальное окно)" style="swimlane;startSize=23;fontStyle=1;fontSize=12;" vertex="1">
+          <mxGeometry x="265" y="100" width="600" height="550" as="geometry" />
+        </mxCell>
+        <mxCell id="28" parent="27" value="Поле: Пользователь (Select, только при создании)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="20" y="40" width="560" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="29" parent="27" value="Поле: Бонусы" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="20" y="90" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="30" parent="27" value="Поле: Процент скидки" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="310" y="90" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="31" parent="27" value="Переключатель: VIP статус" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="20" y="140" width="560" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="32" parent="27" value="Поле: Источник" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="20" y="190" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="33" parent="27" value="Поле: День рождения" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="310" y="190" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="34" parent="27" value="Поле: Теги" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="20" y="240" width="560" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="35" parent="27" value="Поле: Заметки" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top" vertex="1">
+          <mxGeometry x="20" y="290" width="560" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="36" parent="27" value="Кнопка &quot;Отмена&quot;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry x="370" y="490" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="37" parent="27" value="Кнопка &quot;Сохранить&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1">
+          <mxGeometry x="480" y="490" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="7" target="27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,79 @@
+<mxfile host="Electron" agent="Gemini CLI" version="1.0">
+  <diagram id="dashboard_page" name="Главная страница (Dashboard)">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="page-background" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f3f4f6;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1400" height="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="layout" value="Layout (Меню навигации)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d1d5db;arcSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="20" width="200" height="960" as="geometry" />
+        </mxCell>
+        <mxCell id="main-content" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="240" y="20" width="1140" height="960" as="geometry" />
+        </mxCell>
+        <mxCell id="header" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="main-content">
+          <mxGeometry y="0" width="1140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="title" value="Dashboard" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;" vertex="1" parent="header">
+          <mxGeometry x="20" y="10" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Главная панель управления" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#6b7280;" vertex="1" parent="header">
+          <mxGeometry x="20" y="40" width="300" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="period-filter-container" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="main-content">
+          <mxGeometry y="80" width="1140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="period-label" value="Статистика" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;" vertex="1" parent="period-filter-container">
+          <mxGeometry x="20" y="15" width="150" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="period-select" value="Период: [День]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d1d5db;arcSize=12;" vertex="1" parent="period-filter-container">
+          <mxGeometry x="970" y="15" width="150" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kpi-grid" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="main-content">
+          <mxGeometry y="140" width="1140" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="kpi-revenue" value="&lt;font style=&quot;font-size: 20px&quot;&gt;&lt;b&gt;250 500 ₽&lt;/b&gt;&lt;/font&gt;&lt;br&gt;Выручка" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f9ff;strokeColor=#bae6fd;arcSize=12;align=center;verticalAlign=middle;" vertex="1" parent="kpi-grid">
+          <mxGeometry x="20" y="10" width="265" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="kpi-orders" value="&lt;font style=&quot;font-size: 20px&quot;&gt;&lt;b&gt;150&lt;/b&gt;&lt;/font&gt;&lt;br&gt;Заказов" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffbeb;strokeColor=#fde68a;arcSize=12;align=center;verticalAlign=middle;" vertex="1" parent="kpi-grid">
+          <mxGeometry x="305" y="10" width="265" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="kpi-avg-check" value="&lt;font style=&quot;font-size: 20px&quot;&gt;&lt;b&gt;1 670 ₽&lt;/b&gt;&lt;/font&gt;&lt;br&gt;Средний чек" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#bbf7d0;arcSize=12;align=center;verticalAlign=middle;" vertex="1" parent="kpi-grid">
+          <mxGeometry x="590" y="10" width="265" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="kpi-new-customers" value="&lt;font style=&quot;font-size: 20px&quot;&gt;&lt;b&gt;25&lt;/b&gt;&lt;/font&gt;&lt;br&gt;Новых клиентов" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eef2ff;strokeColor=#c7d2fe;arcSize=12;align=center;verticalAlign=middle;" vertex="1" parent="kpi-grid">
+          <mxGeometry x="875" y="10" width="265" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="charts-grid" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="main-content">
+          <mxGeometry y="280" width="1140" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="sales-chart-card" value="График продаж" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d1d5db;arcSize=12;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;fontSize=16;fontStyle=1;" vertex="1" parent="charts-grid">
+          <mxGeometry x="20" y="10" width="700" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="sales-chart-placeholder" value="[LineChart: Выручка, Заказы]" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#9ca3af;" vertex="1" parent="sales-chart-card">
+          <mxGeometry x="20" y="50" width="660" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="top-products-card" value="ТОП товаров" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d1d5db;arcSize=12;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;fontSize=16;fontStyle=1;" vertex="1" parent="charts-grid">
+          <mxGeometry x="740" y="10" width="380" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="product-1" value="1. Кофе 'Арабика'" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="top-products-card">
+            <mxGeometry x="20" y="50" width="340" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="product-2" value="2. Круассан с миндалем" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="top-products-card">
+            <mxGeometry x="20" y="90" width="340" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="product-3" value="3. Капучино" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="top-products-card">
+            <mxGeometry x="20" y="130" width="340" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="product-4" value="4. Чизкейк 'Нью-Йорк'" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="top-products-card">
+            <mxGeometry x="20" y="170" width="340" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="product-5" value="5. Латте" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="top-products-card">
+            <mxGeometry x="20" y="210" width="340" height="30" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

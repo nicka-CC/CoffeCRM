@@ -1,0 +1,37 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.4.0 Chrome/120.0.6099.284 Electron/28.2.4 Safari/537.36" version="24.4.0">
+  <diagram name="CoffeCRM Login Page" id="k0l1m2n3-g5h6-4i7j-d4e5-5l6m7n8o9p0q">
+    <mxGraphModel dx="1434" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="2339" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;" vertex="1" parent="1">
+          <mxGeometry width="1654" height="1200" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="577" y="200" width="500" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Authorization" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="627" y="240" width="400" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Email" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+            <mxGeometry x="627" y="320" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;strokeColor=#cccccc;" vertex="1" parent="1">
+            <mxGeometry x="627" y="350" width="400" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Password" style="text;html=1;align=left;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+            <mxGeometry x="627" y="410" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;strokeColor=#cccccc;" vertex="1" parent="1">
+            <mxGeometry x="627" y="440" width="400" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="Login" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#2196f3;strokeColor=#1976d2;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="627" y="520" width="400" height="50" as="geometry" />
+        </mxCell>
+         <mxCell id="10" value="Invalid credentials. Please try again." style="text;html=1;fontColor=#f44336;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="627" y="580" width="400" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
