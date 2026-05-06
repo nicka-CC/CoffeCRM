@@ -29,15 +29,44 @@ const SettingsPage: React.FC = () => {
 
   return (
       <Layout title="Настройки" subtitle="Управление настройками компании, платежами и интеграциями">
-        <Box sx={{ p: 3 }}>
-          <Paper sx={{ border: '1px solid #e2e8f0' }}>
-            <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ borderBottom: '1px solid #e2e8f0' }}>
+        <Box sx={{ p: 4, maxWidth: 1200, mx: 'auto' }}>
+          <Paper 
+            sx={{ 
+              borderRadius: 3, 
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)',
+              overflow: 'hidden'
+            }}
+          >
+            <Tabs 
+              value={tab} 
+              onChange={(_, v) => setTab(v)} 
+              sx={{ 
+                borderBottom: '1px solid #e2e8f0',
+                bgcolor: '#f8fafc',
+                '& .MuiTab-root': {
+                  minHeight: 64,
+                  textTransform: 'none',
+                  fontSize: '0.95rem',
+                  fontWeight: 500,
+                  color: '#64748b',
+                  '&.Mui-selected': {
+                    color: '#1e293b',
+                    fontWeight: 600
+                  }
+                },
+                '& .MuiTabs-indicator': {
+                  height: 3,
+                  bgcolor: '#3b82f6',
+                  borderRadius: '3px 3px 0 0'
+                }
+              }}
+            >
               <Tab label="Компания" />
               <Tab label="Платежи" />
               <Tab label="Интеграции" />
             </Tabs>
 
-            <Box sx={{ p: 3 }}>
+            <Box sx={{ p: 4, bgcolor: '#ffffff', minHeight: 600 }}>
               {tab === 0 && <CompanySettings />}
               {tab === 1 && <PaymentSettings />}
               {tab === 2 && <IntegrationSettings />}

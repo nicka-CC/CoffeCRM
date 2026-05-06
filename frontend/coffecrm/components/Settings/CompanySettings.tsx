@@ -6,7 +6,6 @@ import {
   Typography,
   TextField,
   Button,
-  Grid,
   Paper,
   CircularProgress,
   Alert,
@@ -122,219 +121,247 @@ const CompanySettings: React.FC = () => {
 
   return (
     <Box component="form" onSubmit={handleSubmit}>
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-            Основная информация
-          </Typography>
-        </Grid>
+      {/* Основная информация */}
+      <Paper sx={{ p: 3, mb: 3, borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, color: '#1e293b' }}>
+          Основная информация
+        </Typography>
+        
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="Название компании"
+              name="name"
+              value={form.name}
+              onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+              fullWidth
+              required
+            />
+          </Box>
 
-        <Grid item xs={12} md={6}>
-          <FormTextField
-            label="Название компании"
-            name="name"
-            value={form.name}
-            onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-            fullWidth
-            required
-          />
-        </Grid>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="Юридическое название"
+              name="legalName"
+              value={form.legalName}
+              onChange={(e) => setForm((prev) => ({ ...prev, legalName: e.target.value }))}
+              fullWidth
+            />
+          </Box>
+        </Box>
 
-        <Grid item xs={12} md={6}>
-          <FormTextField
-            label="Юридическое название"
-            name="legalName"
-            value={form.legalName}
-            onChange={(e) => setForm((prev) => ({ ...prev, legalName: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item xs={12}>
+        <Box sx={{ mt: 3 }}>
           <FormTextField
             label="Описание"
             name="description"
             value={form.description}
             onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
             multiline
-            minRows={2}
+            minRows={3}
             fullWidth
           />
-        </Grid>
+        </Box>
+      </Paper>
 
-        <Grid item xs={12}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, mt: 2 }}>
-            Реквизиты
-          </Typography>
-        </Grid>
+      {/* Реквизиты */}
+      <Paper sx={{ p: 3, mb: 3, borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, color: '#1e293b' }}>
+          Реквизиты
+        </Typography>
+        
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, mb: 3 }}>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="ИНН"
+              name="inn"
+              value={form.inn}
+              onChange={(e) => setForm((prev) => ({ ...prev, inn: e.target.value }))}
+              fullWidth
+            />
+          </Box>
 
-        <Grid item xs={12} md={4}>
-          <FormTextField
-            label="ИНН"
-            name="inn"
-            value={form.inn}
-            onChange={(e) => setForm((prev) => ({ ...prev, inn: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="КПП"
+              name="kpp"
+              value={form.kpp}
+              onChange={(e) => setForm((prev) => ({ ...prev, kpp: e.target.value }))}
+              fullWidth
+            />
+          </Box>
 
-        <Grid item xs={12} md={4}>
-          <FormTextField
-            label="КПП"
-            name="kpp"
-            value={form.kpp}
-            onChange={(e) => setForm((prev) => ({ ...prev, kpp: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="ОГРН"
+              name="ogrn"
+              value={form.ogrn}
+              onChange={(e) => setForm((prev) => ({ ...prev, ogrn: e.target.value }))}
+              fullWidth
+            />
+          </Box>
+        </Box>
 
-        <Grid item xs={12} md={4}>
-          <FormTextField
-            label="ОГРН"
-            name="ogrn"
-            value={form.ogrn}
-            onChange={(e) => setForm((prev) => ({ ...prev, ogrn: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="Юридический адрес"
+              name="address"
+              value={form.address}
+              onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
+              fullWidth
+            />
+          </Box>
 
-        <Grid item xs={12} md={6}>
-          <FormTextField
-            label="Юридический адрес"
-            name="address"
-            value={form.address}
-            onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="Фактический адрес"
+              name="actualAddress"
+              value={form.actualAddress}
+              onChange={(e) => setForm((prev) => ({ ...prev, actualAddress: e.target.value }))}
+              fullWidth
+            />
+          </Box>
+        </Box>
+      </Paper>
 
-        <Grid item xs={12} md={6}>
-          <FormTextField
-            label="Фактический адрес"
-            name="actualAddress"
-            value={form.actualAddress}
-            onChange={(e) => setForm((prev) => ({ ...prev, actualAddress: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
+      {/* Контакты */}
+      <Paper sx={{ p: 3, mb: 3, borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, color: '#1e293b' }}>
+          Контакты
+        </Typography>
+        
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="Телефон"
+              name="phone"
+              value={form.phone}
+              onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
+              fullWidth
+            />
+          </Box>
 
-        <Grid item xs={12}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, mt: 2 }}>
-            Контакты
-          </Typography>
-        </Grid>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="Email"
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+              fullWidth
+            />
+          </Box>
 
-        <Grid item xs={12} md={4}>
-          <TextField
-            label="Телефон"
-            name="phone"
-            value={form.phone}
-            onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="Сайт"
+              name="website"
+              value={form.website}
+              onChange={(e) => setForm((prev) => ({ ...prev, website: e.target.value }))}
+              fullWidth
+            />
+          </Box>
+        </Box>
+      </Paper>
 
-        <Grid item xs={12} md={4}>
-          <TextField
-            label="Email"
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
+      {/* Банковские реквизиты и ответственные лица */}
+      <Paper sx={{ p: 3, mb: 3, borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, color: '#1e293b' }}>
+          Банковские реквизиты
+        </Typography>
+        
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, mb: 3 }}>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="Банк"
+              name="bankName"
+              value={form.bankName}
+              onChange={(e) => setForm((prev) => ({ ...prev, bankName: e.target.value }))}
+              fullWidth
+            />
+          </Box>
 
-        <Grid item xs={12} md={4}>
-          <TextField
-            label="Сайт"
-            name="website"
-            value={form.website}
-            onChange={(e) => setForm((prev) => ({ ...prev, website: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="Расчетный счет"
+              name="bankAccount"
+              value={form.bankAccount}
+              onChange={(e) => setForm((prev) => ({ ...prev, bankAccount: e.target.value }))}
+              fullWidth
+            />
+          </Box>
+        </Box>
 
-        <Grid item xs={12}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, mt: 2 }}>
-            Банковские реквизиты
-          </Typography>
-        </Grid>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, mb: 4 }}>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="БИК"
+              name="bankBik"
+              value={form.bankBik}
+              onChange={(e) => setForm((prev) => ({ ...prev, bankBik: e.target.value }))}
+              fullWidth
+            />
+          </Box>
 
-        <Grid item xs={12} md={6}>
-          <TextField
-            label="Банк"
-            name="bankName"
-            value={form.bankName}
-            onChange={(e) => setForm((prev) => ({ ...prev, bankName: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="Система налогообложения"
+              name="taxSystem"
+              value={form.taxSystem}
+              onChange={(e) => setForm((prev) => ({ ...prev, taxSystem: e.target.value }))}
+              fullWidth
+            />
+          </Box>
+        </Box>
 
-        <Grid item xs={12} md={6}>
-          <TextField
-            label="Расчетный счет"
-            name="bankAccount"
-            value={form.bankAccount}
-            onChange={(e) => setForm((prev) => ({ ...prev, bankAccount: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
+        <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, mt: 4, color: '#1e293b' }}>
+          Ответственные лица
+        </Typography>
+        
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="Директор"
+              name="director"
+              value={form.director}
+              onChange={(e) => setForm((prev) => ({ ...prev, director: e.target.value }))}
+              fullWidth
+            />
+          </Box>
 
-        <Grid item xs={12} md={6}>
-          <TextField
-            label="БИК"
-            name="bankBik"
-            value={form.bankBik}
-            onChange={(e) => setForm((prev) => ({ ...prev, bankBik: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
+          <Box sx={{ flex: 1 }}>
+            <FormTextField
+              label="Бухгалтер"
+              name="accountant"
+              value={form.accountant}
+              onChange={(e) => setForm((prev) => ({ ...prev, accountant: e.target.value }))}
+              fullWidth
+            />
+          </Box>
+        </Box>
+      </Paper>
 
-        <Grid item xs={12} md={6}>
-          <TextField
-            label="Система налогообложения"
-            name="taxSystem"
-            value={form.taxSystem}
-            onChange={(e) => setForm((prev) => ({ ...prev, taxSystem: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <FormTextField
-            label="Директор"
-            name="director"
-            value={form.director}
-            onChange={(e) => setForm((prev) => ({ ...prev, director: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <FormTextField
-            label="Бухгалтер"
-            name="accountant"
-            value={form.accountant}
-            onChange={(e) => setForm((prev) => ({ ...prev, accountant: e.target.value }))}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item xs={12}>
-          <Button
-            type="submit"
-            variant="contained"
-            startIcon={<SaveIcon />}
-            disabled={saving || !allowedToSubmit}
-            sx={{ mt: 2 }}
-          >
-            {saving ? 'Сохранение...' : 'Сохранить'}
-          </Button>
-        </Grid>
-      </Grid>
+      {/* Кнопка сохранения */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+        <Button
+          type="submit"
+          variant="contained"
+          startIcon={<SaveIcon />}
+          disabled={saving || !allowedToSubmit}
+          sx={{ 
+            px: 4, 
+            py: 1.5,
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 500,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}
+        >
+          {saving ? 'Сохранение...' : 'Сохранить'}
+        </Button>
+      </Box>
     </Box>
   );
 };

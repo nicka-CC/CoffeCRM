@@ -82,7 +82,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <Layout title="Dashboard" subtitle="Главная панель управления">
+      <Layout title="Дашборд" subtitle="Главная панель управления">
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
           <CircularProgress />
         </Box>
@@ -92,7 +92,7 @@ export default function Home() {
 
   if (error || !dashboardData) {
     return (
-      <Layout title="Dashboard" subtitle="Главная панель управления">
+      <Layout title="Дашборд" subtitle="Главная панель управления">
         <Alert severity="error">{error || 'Ошибка загрузки данных'}</Alert>
       </Layout>
     );

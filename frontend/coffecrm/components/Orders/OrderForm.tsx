@@ -271,7 +271,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ open, onClose, onSuccess, order }
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                   Товары в заказе
                 </Typography>
-                <Button startIcon={<AddIcon />} onClick={handleAddItem} size="small" disabled={!!canCreateResource('order') || !editable}>
+                <Button startIcon={<AddIcon />} onClick={handleAddItem} size="small">
                   Добавить товар
                 </Button>
               </Box>
